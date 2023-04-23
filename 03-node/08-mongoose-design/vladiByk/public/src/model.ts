@@ -23,11 +23,8 @@ class Student {
         .then(({ grades }) => grades.map((grade: GradeTemplate) => grade.score))
         .catch((error) => console.error(error));
 
-      // console.log(grades);
-
       const gradesAverage = grades.reduce((a, b) => a + b, 0) / grades.length;
 
-      // console.log(gradesAverage);
 
       return gradesAverage;
     } catch (error) {

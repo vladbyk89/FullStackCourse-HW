@@ -148,41 +148,34 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
 
 const displayStudents = async (courseId: string) => {
   try {
-    const studentList: Student[] = await fetch(`${studentApi}/${courseId}`)
+    
+    let studentsRootHtml: string = " ";
+
+    await fetch(`${studentApi}/${courseId}`)
       .then((res) => res.json())
       .then(({ students }) =>
-        students.map(
-          (student: StudentTemplate) =>
-            new Student(student.name, student._id, courseId)
-        )
-      );
-    console.log(studentList);
-
-    if (studentList) {
-      let studentsRootHtml: string;
-
-      studentList.forEach(async (student) => {
-        const studentAvgScore = await student.getAverageInCourse(courseId);
-        studentsRootHtml += `
-        <div class="studentDiv">
-            <b>${student.name}</b>
-            <span>${studentAvgScore}</span>
-            <div class="crudIcons">
-              <i class="fa-regular fa-trash-can"></i>
-              <i class="fa-regular fa-pen-to-square"></i>
-            </div>
-        </div>`;
-        renderStudentsPage(studentsRootHtml, courseId);
-      });
-    }
+        students.forEach(async (student: StudentTemplate) => {
+          const newStudent = new Student(student.name, student._id, courseId);
+          const studentAvgScore = await newStudent.getAverageInCourse(courseId);
+          studentsRootHtml += `
+          <div class="studentDiv">
+              <b>${student.name}</b>
+              <span>${studentAvgScore}</span>
+              <div class="crudIcons">
+                <i class="fa-regular fa-trash-can"></i>
+                <i class="fa-regular fa-pen-to-square"></i>
+              </div>
+          </div>`;
+          renderStudentsPage(studentsRootHtml, courseId);
+        })
+      )
+      .catch((error) => console.log(error));
   } catch (error) {
     console.error(error);
   }
 };
 
-async function buildStudentHtml(){
-  
-}
+async function buildStudentHtml() {}
 
 // async function getAverageInCourse(studentId: string, courseId: string) {
 //   const grades: number[] = await fetch(

@@ -142,34 +142,31 @@ function renderStudentsPage(studentsRootHtml, courseId) {
 }
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const studentList = yield fetch(`${studentApi}/${courseId}`)
+        let studentsRootHtml = " ";
+        yield fetch(`${studentApi}/${courseId}`)
             .then((res) => res.json())
-            .then(({ students }) => students.map((student) => new Student(student.name, student._id, courseId)));
-        console.log(studentList);
-        if (studentList) {
-            let studentsRootHtml;
-            studentList.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
-                const studentAvgScore = yield student.getAverageInCourse(courseId);
-                studentsRootHtml += `
-        <div class="studentDiv">
-            <b>${student.name}</b>
-            <span>${studentAvgScore}</span>
-            <div class="crudIcons">
-              <i class="fa-regular fa-trash-can"></i>
-              <i class="fa-regular fa-pen-to-square"></i>
-            </div>
-        </div>`;
-                renderStudentsPage(studentsRootHtml, courseId);
-            }));
-        }
+            .then(({ students }) => students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
+            const newStudent = new Student(student.name, student._id, courseId);
+            const studentAvgScore = yield newStudent.getAverageInCourse(courseId);
+            studentsRootHtml += `
+          <div class="studentDiv">
+              <b>${student.name}</b>
+              <span>${studentAvgScore}</span>
+              <div class="crudIcons">
+                <i class="fa-regular fa-trash-can"></i>
+                <i class="fa-regular fa-pen-to-square"></i>
+              </div>
+          </div>`;
+            renderStudentsPage(studentsRootHtml, courseId);
+        })))
+            .catch((error) => console.log(error));
     }
     catch (error) {
         console.error(error);
     }
 });
 function buildStudentHtml() {
-    return __awaiter(this, void 0, void 0, function* () {
-    });
+    return __awaiter(this, void 0, void 0, function* () { });
 }
 // async function getAverageInCourse(studentId: string, courseId: string) {
 //   const grades: number[] = await fetch(
