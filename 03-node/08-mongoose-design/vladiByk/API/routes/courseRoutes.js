@@ -11,6 +11,6 @@ const courseController_1 = require("../controllers/courseController");
 courseRouter.route("/").get(courseController_1.getAllCourses).post(courseController_1.createCourse);
 courseRouter
     .route("/:id")
-    .get(courseController_1.getCourse)
+    .get(courseController_1.getTeacherCourses)
     .patch(courseController_1.updateCourse)
     .delete(courseController_1.deleteCourse);

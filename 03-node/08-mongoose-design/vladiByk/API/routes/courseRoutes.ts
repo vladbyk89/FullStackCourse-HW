@@ -2,7 +2,7 @@ import express from "express";
 const courseRouter = express.Router();
 import {
   getAllCourses,
-  getCourse,
+  getTeacherCourses,
   createCourse,
   deleteCourse,
   updateCourse,
@@ -12,7 +12,7 @@ courseRouter.route("/").get(getAllCourses).post(createCourse);
 
 courseRouter
   .route("/:id")
-  .get(getCourse)
+  .get(getTeacherCourses)
   .patch(updateCourse)
   .delete(deleteCourse);
 

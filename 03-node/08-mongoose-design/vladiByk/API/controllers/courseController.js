@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getAllCourses = void 0;
+exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getTeacherCourses = exports.getAllCourses = void 0;
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
 const TeacherModel_1 = __importDefault(require("../models/TeacherModel"));
 const getAllCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -25,7 +25,7 @@ const getAllCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getAllCourses = getAllCourses;
-const getCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getTeacherCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: teacherId } = req.params;
         const teacher = yield TeacherModel_1.default.findById(teacherId);
@@ -37,7 +37,7 @@ const getCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         res.status(500).send({ error: error.message });
     }
 });
-exports.getCourse = getCourse;
+exports.getTeacherCourses = getTeacherCourses;
 const createCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseName, teacherId } = req.body;

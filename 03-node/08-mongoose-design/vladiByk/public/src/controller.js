@@ -77,6 +77,10 @@ function renderCoursePage(teacherId) {
             console.log(courseName);
             addCourse(courseName, teacherId);
         });
+        const coursesBtn = root.querySelectorAll(".course");
+        coursesBtn.forEach((btn) => btn.addEventListener("click", () => {
+            displayStudents(btn.id);
+        }));
     });
 }
 function addCourse(courseName, teacherId) {
@@ -98,31 +102,23 @@ function renderCoursesRoot(coursesList) {
         .map((course) => `<button class="course" id="${course._id}">${course.name}</button>`)
         .join("");
 }
-const renderStudents = () => {
-    //   const html = students
-    //     .map(
-    //       (student) =>
-    //         `<div class="studentDiv" id="${student.id}">
-    //             <b>${student.name}</b>
-    //             <span>Average: ${student}</span>
-    //             <div class="crudIcons">
-    //               <i class="fa-regular fa-trash-can"></i>
-    //               <i class="fa-regular fa-pen-to-square"></i>
-    //              </div>
-    //             </div>`
-    //     )
-    //     .join("");
-    root.innerHTML = `
-    <h1>Student list</h1>
-    <div id="studentsRoot">
+function renderStudentsPage(students, courseId) {
+    const studentsRootHtml = students
+        .map((student) => `
         <div class="studentDiv">
-            <b>Vladislav Bykanov</b>
-            <span>Average: 99</span>
+            <b>${student.name}</b>
+            <span>${student.studentAverage}</span>
             <div class="crudIcons">
               <i class="fa-regular fa-trash-can"></i>
               <i class="fa-regular fa-pen-to-square"></i>
             </div>
         </div>
+        `)
+        .join("");
+    root.innerHTML = `
+    <h1>Student list</h1>
+    <div id="studentsRoot">
+      ${studentsRootHtml}
     </div>
     <h4>Add student</h4>
     <form id="addStudentForm">
@@ -137,20 +133,50 @@ const renderStudents = () => {
     </form>
     <div class="editWindow"></div>
   `;
-    const deleteButtons = document.querySelectorAll(".fa-trash-can");
-    deleteButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
-        const id = (_b = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.id;
-        yield fetch(`${studentApi}/${id}`, {
-            method: "DELETE",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-        }).catch((error) => console.error(error));
-        displayStudents();
-    })));
-};
+    // const deleteButtons = document.querySelectorAll(
+    //   ".fa-trash-can"
+    // ) as NodeListOf<HTMLElement>;
+    // deleteButtons.forEach((btn) =>
+    //   btn.addEventListener("click", async () => {
+    //     const id = btn.parentElement?.parentElement?.id;
+    //     await fetch(`${studentApi}/${id}`, {
+    //       method: "DELETE",
+    //       headers: {
+    //         Accept: "application/json",
+    //         "Content-Type": "application/json",
+    //       },
+    //     }).catch((error) => console.error(error));
+    //     displayStudents();
+    //   })
+    // );
+}
+const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const studentList = yield fetch(`${studentApi}/${courseId}`)
+            .then((res) => res.json())
+            .then(({ students }) => students.map((student) => new Student(student.name, student._id, courseId)));
+        console.log(studentList);
+        studentList.forEach((student) => student.getAverageInCourse(courseId));
+        console.log(studentList);
+        if (studentList)
+            renderStudentsPage(studentList, courseId);
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
+// async function getAverageInCourse(studentId: string, courseId: string) {
+//   const grades: number[] = await fetch(
+//     `${gradesApi}/${studentId}?courseId=${courseId}`
+//   )
+//     .then((res) => res.json())
+//     .then(({ grades }) => grades.map((grade: GradeTemplate) => grade.score))
+//     .catch((error) => console.error(error));
+//   console.log(grades);
+//   const gradesAverage: number =
+//     grades.reduce((a, b) => a + b, 0) / grades.length;
+//   console.log(gradesAverage);
+// }
 // async function displayTeacherCourses(e: Event) {
 //   e.preventDefault();
 //   const teacherId = teacherIdInput.value;
@@ -167,18 +193,6 @@ const renderStudents = () => {
 //   console.log(courseList);
 //   teacherIdInput.value = "";
 // }
-const displayStudents = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const studentList = yield fetch(studentApi)
-            .then((res) => res.json())
-            .then(({ students }) => students.map((student) => new Student(student.name, student._id)));
-        if (studentList)
-            renderStudents();
-    }
-    catch (error) {
-        console.error(error);
-    }
-});
 // async function handleAddStudentForm(e: Event) {
 //   e.preventDefault();
 //   const newStudentName = addStudentForm.fullName.value;

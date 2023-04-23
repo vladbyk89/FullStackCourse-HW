@@ -15,15 +15,16 @@ export const getAllStudents = async (
   }
 };
 
-export const getStudent = async (
+export const getStudentsInCourse = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { id: studentId } = req.params;
-    const student = await Student.findById({ _id: studentId });
-    res.status(200).send({ student });
+    const { id: courseId } = req.params;
+    const course = await Course.findById({ _id: courseId });
+    const students = await Student.find({ courses: course });
+    res.status(200).send({ students });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

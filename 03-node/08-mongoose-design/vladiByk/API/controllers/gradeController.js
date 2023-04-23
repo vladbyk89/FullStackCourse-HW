@@ -28,9 +28,14 @@ const getAllGrades = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.getAllGrades = getAllGrades;
 const getGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: gradeId } = req.params;
-        const grade = yield GradeModel_1.default.findById({ _id: gradeId });
-        res.status(200).send({ grade });
+        const { courseId } = req.query;
+        const { id: studentId } = req.params;
+        const course = yield CourseModel_1.default.findById(courseId);
+        console.log(course);
+        const student = yield StudentModel_1.default.findById(studentId);
+        console.log(student);
+        const grades = yield GradeModel_1.default.find({ course, student });
+        res.status(200).send({ grades });
     }
     catch (error) {
         console.error(error);

@@ -15,7 +15,7 @@ export const getAllCourses = async (
   }
 };
 
-export const getCourse = async (
+export const getTeacherCourses = async (
   req: Request,
   res: Response,
   next: NextFunction
