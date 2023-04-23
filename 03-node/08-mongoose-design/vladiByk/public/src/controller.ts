@@ -108,21 +108,7 @@ function renderCoursesRoot(coursesList: CourseTemplate[]) {
     .join("");
 }
 
-function renderStudentsPage(students: Student[], courseId: string) {
-  const studentsRootHtml = students
-    .map(
-      (student) => `
-        <div class="studentDiv">
-            <b>${student.name}</b>
-            <span>${student.studentAverage}</span>
-            <div class="crudIcons">
-              <i class="fa-regular fa-trash-can"></i>
-              <i class="fa-regular fa-pen-to-square"></i>
-            </div>
-        </div>
-        `
-    )
-    .join("");
+async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
   root.innerHTML = `
     <h1>Student list</h1>
     <div id="studentsRoot">
@@ -171,13 +157,32 @@ const displayStudents = async (courseId: string) => {
         )
       );
     console.log(studentList);
-    studentList.forEach((student) => student.getAverageInCourse(courseId));
-    console.log(studentList);
-    if (studentList) renderStudentsPage(studentList, courseId);
+
+    if (studentList) {
+      let studentsRootHtml: string;
+
+      studentList.forEach(async (student) => {
+        const studentAvgScore = await student.getAverageInCourse(courseId);
+        studentsRootHtml += `
+        <div class="studentDiv">
+            <b>${student.name}</b>
+            <span>${studentAvgScore}</span>
+            <div class="crudIcons">
+              <i class="fa-regular fa-trash-can"></i>
+              <i class="fa-regular fa-pen-to-square"></i>
+            </div>
+        </div>`;
+        renderStudentsPage(studentsRootHtml, courseId);
+      });
+    }
   } catch (error) {
     console.error(error);
   }
 };
+
+async function buildStudentHtml(){
+  
+}
 
 // async function getAverageInCourse(studentId: string, courseId: string) {
 //   const grades: number[] = await fetch(

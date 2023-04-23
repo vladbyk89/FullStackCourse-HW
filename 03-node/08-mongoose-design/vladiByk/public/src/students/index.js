@@ -109,7 +109,7 @@ function deleteGrade(btnsArr, studentToUpdate) {
         //   },
         //   body: JSON.stringify({ grade, gradeIndex, delete: true }),
         // }).catch((error) => console.error(error));
-        displayStudents();
+        // displayStudents();
     })));
 }
 function addGrade(btn, newGradeInput, student) {
@@ -137,7 +137,7 @@ function updateGrade(input, studentID) {
             body: JSON.stringify({ grade: input.value, delete: false }),
         }).catch((error) => console.error(error));
         renderGradeList(studentID);
-        displayStudents();
+        // displayStudents();
         input.value = "";
     });
 }

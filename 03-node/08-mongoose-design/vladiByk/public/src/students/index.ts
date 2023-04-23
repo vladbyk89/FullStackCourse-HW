@@ -125,7 +125,7 @@ function deleteGrade(btnsArr: Element[], studentToUpdate: Student) {
       //   body: JSON.stringify({ grade, gradeIndex, delete: true }),
       // }).catch((error) => console.error(error));
 
-      displayStudents();
+      // displayStudents();
     })
   );
 }
@@ -164,7 +164,7 @@ async function updateGrade(input: HTMLInputElement, studentID: string) {
   }).catch((error) => console.error(error));
 
   renderGradeList(studentID);
-  displayStudents();
+  // displayStudents();
 
   input.value = "";
 }

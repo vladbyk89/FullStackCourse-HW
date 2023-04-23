@@ -8,7 +8,6 @@ interface TeacherTemplate {
 }
 
 class Student {
-  public studentAverage: number = 0;
   constructor(
     public name: string,
     public id: string,
@@ -16,21 +15,24 @@ class Student {
   ) {}
 
   async getAverageInCourse(courseId: string) {
-    const grades: number[] = await fetch(
-      `${gradesApi}/${this.id}?courseId=${courseId}`
-    )
-      .then((res) => res.json())
-      .then(({ grades }) => grades.map((grade: GradeTemplate) => grade.score))
-      .catch((error) => console.error(error));
+    try {
+      const grades: number[] = await fetch(
+        `${gradesApi}/${this.id}?courseId=${courseId}`
+      )
+        .then((res) => res.json())
+        .then(({ grades }) => grades.map((grade: GradeTemplate) => grade.score))
+        .catch((error) => console.error(error));
 
-    console.log(grades);
+      // console.log(grades);
 
-    const gradesAverage: number =
-      grades.reduce((a, b) => a + b, 0) / grades.length;
+      const gradesAverage = grades.reduce((a, b) => a + b, 0) / grades.length;
 
-    console.log(gradesAverage);
+      // console.log(gradesAverage);
 
-    this.studentAverage = gradesAverage;
+      return gradesAverage;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

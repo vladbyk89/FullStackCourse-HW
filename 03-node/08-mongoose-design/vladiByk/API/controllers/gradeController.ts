@@ -25,9 +25,7 @@ export const getGrade = async (
     const { courseId } = req.query;
     const { id: studentId } = req.params;
     const course = await Course.findById(courseId);
-    console.log(course);
     const student = await Student.findById(studentId);
-    console.log(student);
     const grades = await Grade.find({ course, student });
     res.status(200).send({ grades });
   } catch (error: any) {

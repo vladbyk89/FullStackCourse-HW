@@ -31,9 +31,7 @@ const getGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const { courseId } = req.query;
         const { id: studentId } = req.params;
         const course = yield CourseModel_1.default.findById(courseId);
-        console.log(course);
         const student = yield StudentModel_1.default.findById(studentId);
-        console.log(student);
         const grades = yield GradeModel_1.default.find({ course, student });
         res.status(200).send({ grades });
     }

@@ -102,20 +102,9 @@ function renderCoursesRoot(coursesList) {
         .map((course) => `<button class="course" id="${course._id}">${course.name}</button>`)
         .join("");
 }
-function renderStudentsPage(students, courseId) {
-    const studentsRootHtml = students
-        .map((student) => `
-        <div class="studentDiv">
-            <b>${student.name}</b>
-            <span>${student.studentAverage}</span>
-            <div class="crudIcons">
-              <i class="fa-regular fa-trash-can"></i>
-              <i class="fa-regular fa-pen-to-square"></i>
-            </div>
-        </div>
-        `)
-        .join("");
-    root.innerHTML = `
+function renderStudentsPage(studentsRootHtml, courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        root.innerHTML = `
     <h1>Student list</h1>
     <div id="studentsRoot">
       ${studentsRootHtml}
@@ -133,22 +122,23 @@ function renderStudentsPage(students, courseId) {
     </form>
     <div class="editWindow"></div>
   `;
-    // const deleteButtons = document.querySelectorAll(
-    //   ".fa-trash-can"
-    // ) as NodeListOf<HTMLElement>;
-    // deleteButtons.forEach((btn) =>
-    //   btn.addEventListener("click", async () => {
-    //     const id = btn.parentElement?.parentElement?.id;
-    //     await fetch(`${studentApi}/${id}`, {
-    //       method: "DELETE",
-    //       headers: {
-    //         Accept: "application/json",
-    //         "Content-Type": "application/json",
-    //       },
-    //     }).catch((error) => console.error(error));
-    //     displayStudents();
-    //   })
-    // );
+        // const deleteButtons = document.querySelectorAll(
+        //   ".fa-trash-can"
+        // ) as NodeListOf<HTMLElement>;
+        // deleteButtons.forEach((btn) =>
+        //   btn.addEventListener("click", async () => {
+        //     const id = btn.parentElement?.parentElement?.id;
+        //     await fetch(`${studentApi}/${id}`, {
+        //       method: "DELETE",
+        //       headers: {
+        //         Accept: "application/json",
+        //         "Content-Type": "application/json",
+        //       },
+        //     }).catch((error) => console.error(error));
+        //     displayStudents();
+        //   })
+        // );
+    });
 }
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -156,15 +146,31 @@ const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function
             .then((res) => res.json())
             .then(({ students }) => students.map((student) => new Student(student.name, student._id, courseId)));
         console.log(studentList);
-        studentList.forEach((student) => student.getAverageInCourse(courseId));
-        console.log(studentList);
-        if (studentList)
-            renderStudentsPage(studentList, courseId);
+        if (studentList) {
+            let studentsRootHtml;
+            studentList.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
+                const studentAvgScore = yield student.getAverageInCourse(courseId);
+                studentsRootHtml += `
+        <div class="studentDiv">
+            <b>${student.name}</b>
+            <span>${studentAvgScore}</span>
+            <div class="crudIcons">
+              <i class="fa-regular fa-trash-can"></i>
+              <i class="fa-regular fa-pen-to-square"></i>
+            </div>
+        </div>`;
+                renderStudentsPage(studentsRootHtml, courseId);
+            }));
+        }
     }
     catch (error) {
         console.error(error);
     }
 });
+function buildStudentHtml() {
+    return __awaiter(this, void 0, void 0, function* () {
+    });
+}
 // async function getAverageInCourse(studentId: string, courseId: string) {
 //   const grades: number[] = await fetch(
 //     `${gradesApi}/${studentId}?courseId=${courseId}`

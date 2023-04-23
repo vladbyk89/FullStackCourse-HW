@@ -18,18 +18,22 @@ class Student {
         this.name = name;
         this.id = id;
         this.courseId = courseId;
-        this.studentAverage = 0;
     }
     getAverageInCourse(courseId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const grades = yield fetch(`${gradesApi}/${this.id}?courseId=${courseId}`)
-                .then((res) => res.json())
-                .then(({ grades }) => grades.map((grade) => grade.score))
-                .catch((error) => console.error(error));
-            console.log(grades);
-            const gradesAverage = grades.reduce((a, b) => a + b, 0) / grades.length;
-            console.log(gradesAverage);
-            this.studentAverage = gradesAverage;
+            try {
+                const grades = yield fetch(`${gradesApi}/${this.id}?courseId=${courseId}`)
+                    .then((res) => res.json())
+                    .then(({ grades }) => grades.map((grade) => grade.score))
+                    .catch((error) => console.error(error));
+                // console.log(grades);
+                const gradesAverage = grades.reduce((a, b) => a + b, 0) / grades.length;
+                // console.log(gradesAverage);
+                return gradesAverage;
+            }
+            catch (error) {
+                console.log(error);
+            }
         });
     }
 }
