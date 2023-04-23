@@ -40,12 +40,12 @@ const getGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.getGrade = getGrade;
 const createGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { grade, courseId, studentId } = req.body;
+        const { score, courseId, studentId } = req.body;
         const student = yield StudentModel_1.default.findById(studentId);
         const course = yield CourseModel_1.default.findById(courseId);
         if (student || course) {
             yield GradeModel_1.default.create({
-                grade,
+                score,
                 course: course,
                 student: student,
             });

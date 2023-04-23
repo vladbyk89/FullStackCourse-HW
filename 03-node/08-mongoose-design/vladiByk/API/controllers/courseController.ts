@@ -8,10 +8,7 @@ export const getAllCourses = async (
   next: NextFunction
 ) => {
   try {
-    const teacherId = req.query.teacherId;
-    const teacher = await Teacher.findById(teacherId);
-    const courses = await Course.find({ teachers: teacher });
-    console.log(courses);
+    const courses = await Course.find({});
     res.status(200).json({ courses });
   } catch (error) {
     console.error(error);
@@ -24,9 +21,10 @@ export const getCourse = async (
   next: NextFunction
 ) => {
   try {
-    const { id: courseId } = req.params;
-    const course = await Course.findById({ _id: courseId });
-    res.status(200).send({ course });
+    const { id: teacherId } = req.params;
+    const teacher = await Teacher.findById(teacherId);
+    const courses = await Course.find({ teachers: teacher });
+    res.status(200).send({ courses });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });
@@ -39,10 +37,14 @@ export const createCourse = async (
   next: NextFunction
 ) => {
   try {
-    const { name, teacherId } = req.body;
+    const { courseName, teacherId } = req.body;
+    console.log(courseName, teacherId);
     const teacher = await Teacher.findById(teacherId);
-    const course = await Course.create({ name: name, teachers: [teacher] });
-    res.status(200).json({ msg: `Teacher ${course} is created...` });
+    const course = await Course.create({
+      name: courseName,
+      teachers: [teacher],
+    });
+    res.status(200).json({ course });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

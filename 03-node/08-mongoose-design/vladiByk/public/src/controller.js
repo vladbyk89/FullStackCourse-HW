@@ -24,30 +24,79 @@ function renderTeacherLogin() {
     </form>`;
     const teacherLoginForm = document.querySelector("#teacherLoginForm");
     const teacherIdInput = document.querySelector("#teacherId");
+    teacherLoginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        checkTeacherId(teacherIdInput.value);
+        teacherIdInput.value = "";
+    });
 }
-function renderCourses() {
-    root.innerHTML = `
+function checkTeacherId(teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const teacher = yield fetch(`${teacherApi}/${teacherId}`)
+                .then((res) => res.json())
+                .then(({ teacher }) => teacher)
+                .catch((error) => console.error(error));
+            if (!teacher)
+                throw new Error("Teacher not found!");
+            console.log(teacher);
+            renderCoursePage(teacher._id);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    });
+}
+function renderCoursePage(teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const courses = yield fetch(`${courseApi}/${teacherId}`)
+            .then((res) => res.json())
+            .then(({ courses }) => courses)
+            .catch((error) => console.error(error));
+        root.innerHTML = `
     <h1>Available courses</h1>
     <div id="coursesRoot">
-      <a href="" class="course">Law</a>
-      <a href="" class="course">English</a>
-      <a href="" class="course">Gym</a>
-      <a href="" class="course">Neurosciences</a>
-      <a href="" class="course">Biochemistry</a>
-      <a href="" class="course">Medicine</a>
     </div>
-    <form action="" method="post">
-      <label for="addCourseName">
+    <form id="addCourseForm">
+      <label for="courseName">
         <input
           type="text"
-          name="addCourseName"
-          id="addCourseName"
+          name="courseName"
+          id="courseName"
           placeholder="Astrophysics..."
         />
       </label>
       <button type="submit">Add</button>
     </form>
     `;
+        renderCoursesRoot(courses);
+        const addCourseForm = root.querySelector("#addCourseForm");
+        addCourseForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const courseName = addCourseForm.courseName.value;
+            console.log(courseName);
+            addCourse(courseName, teacherId);
+        });
+    });
+}
+function addCourse(courseName, teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield fetch(`${courseApi}`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ courseName, teacherId }),
+        }).catch((error) => console.error(error));
+        renderCoursePage(teacherId);
+    });
+}
+function renderCoursesRoot(coursesList) {
+    const coursesRoot = document.querySelector("#coursesRoot");
+    coursesRoot.innerHTML = coursesList
+        .map((course) => `<button class="course" id="${course._id}">${course.name}</button>`)
+        .join("");
 }
 const renderStudents = () => {
     //   const html = students

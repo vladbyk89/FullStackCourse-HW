@@ -3,12 +3,13 @@ import { StudentSchema } from "./StudentModel";
 import { CourseSchema } from "./CourseModel";
 
 interface Grade {
-  name: string;
+  score: string;
+  _id: string;
 }
 
 export const GradeSchema: Schema = new Schema(
   {
-    grade: Number,
+    score: Number,
     course: CourseSchema,
     student: StudentSchema,
   },

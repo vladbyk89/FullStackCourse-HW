@@ -37,12 +37,12 @@ export const createGrade = async (
   next: NextFunction
 ) => {
   try {
-    const { grade, courseId, studentId } = req.body;
+    const { score, courseId, studentId } = req.body;
     const student = await Student.findById(studentId);
     const course = await Course.findById(courseId);
     if (student || course) {
       await Grade.create({
-        grade,
+        score,
         course: course,
         student: student,
       });
