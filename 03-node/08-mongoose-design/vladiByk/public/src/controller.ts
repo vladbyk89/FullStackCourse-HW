@@ -155,10 +155,11 @@ const displayStudents = async (courseId: string) => {
         students.forEach(async (student: StudentTemplate) => {
           const newStudent = new Student(student.name, student._id, courseId);
           const studentAvgScore = await newStudent.getAverageInCourse(courseId);
+          if (!studentAvgScore) return;
           studentsRootHtml += `
           <div class="studentDiv" id="${student._id}">
               <b>${student.name}</b>
-              <span>${studentAvgScore}</span>
+              <span>${studentAvgScore.toFixed(2)}</span>
               <div class="crudIcons">
                 <i class="fa-regular fa-trash-can"></i>
                 <i class="fa-regular fa-pen-to-square"></i>
@@ -180,33 +181,12 @@ async function handleAddStudentForm(
   const newStudentName = addStudentForm.fullName.value;
   const newStudentGrade = addStudentForm.grade.value;
 
-  const createdStudent: StudentTemplate = await fetch(`${studentApi}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: newStudentName, courseId }),
-  })
-    .then((res) => res.json())
-    .then(({ student }) => student)
-    .catch((error) => console.error(error));
+  const createdStudent: StudentTemplate = await createStudent(
+    newStudentName,
+    courseId
+  );
 
-  const createdGrade = await fetch(`${gradesApi}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      score: parseInt(newStudentGrade),
-      courseId,
-      studentId: createdStudent._id,
-    }),
-  })
-    .then((res) => res.json())
-    .then(({ grade }) => grade)
-    .catch((error) => console.error(error));
+  await createGrade(parseInt(newStudentGrade), courseId, createdStudent._id);
 
   displayStudents(courseId);
 }
@@ -271,7 +251,7 @@ function renderGradeList(gradeList: GradeTemplate[]) {
     .map(
       (grade) =>
         `<li id="${grade._id}">
-    <span>${grade.score}</span>
+    <span>${grade.score.toFixed(2)}</span>
     <div class="listIcons">
       <i class="fa-regular fa-square-minus"></i>
       <i class="fa-solid fa-pen"></i>
@@ -443,6 +423,6 @@ function activateAddGrade(courseId: string, studentId: string) {
 
     newGradeInput.value = "";
   }
-  
+
   newGradeInput.focus();
 }
