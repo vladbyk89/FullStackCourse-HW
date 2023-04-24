@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateGrade = exports.deleteGrade = exports.createGrade = exports.getGrade = exports.getAllGrades = void 0;
+exports.updateGrade = exports.deleteGrade = exports.createGrade = exports.getStudentGradesInCourse = exports.getAllGrades = void 0;
 const GradeModel_1 = __importDefault(require("../models/GradeModel"));
 const StudentModel_1 = __importDefault(require("../models/StudentModel"));
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
@@ -26,7 +26,7 @@ const getAllGrades = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.getAllGrades = getAllGrades;
-const getGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getStudentGradesInCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseId } = req.query;
         const { id: studentId } = req.params;
@@ -40,7 +40,7 @@ const getGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).send({ error: error.message });
     }
 });
-exports.getGrade = getGrade;
+exports.getStudentGradesInCourse = getStudentGradesInCourse;
 const createGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { score, courseId, studentId } = req.body;

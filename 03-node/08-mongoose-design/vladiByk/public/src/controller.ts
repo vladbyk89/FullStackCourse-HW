@@ -262,6 +262,7 @@ async function activateEditButtons(courseId: string) {
 
 function renderGradeList(gradeList: GradeTemplate[]) {
   const studentName = gradeList[0].student.name;
+  const studentId = gradeList[0].student._id;
   const courseId = gradeList[0].course._id;
 
   const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
@@ -281,7 +282,7 @@ function renderGradeList(gradeList: GradeTemplate[]) {
 
   editWindow.innerHTML = `
       <h2>${studentName}</h2>
-      <ul class="gradesList">
+      <ul class="gradesList" id="${courseId}">
           <div><b>Grades</b><b>Edit</b></div>
         ${listItemsHtml}
       </ul>
@@ -305,6 +306,7 @@ function renderGradeList(gradeList: GradeTemplate[]) {
 
   activateEditGradeButtons();
   activateDeleteGradeBtn();
+  activateAddGrade(courseId, studentId);
 }
 
 function activateEditGradeButtons() {
@@ -396,7 +398,76 @@ function activateDeleteGradeBtn() {
         .then((res) => res.json())
         .then(({ grade }) => grade)
         .catch((error) => console.error(error));
-
     })
   );
+}
+
+function activateAddGrade(courseId: string, studentId: string) {
+  const addGradeBtn = root.querySelector("#addGradeBtn") as HTMLInputElement;
+
+  const newGradeInput = root.querySelector(
+    "#newGradeInput"
+  ) as HTMLInputElement;
+
+  addGradeBtn.addEventListener("click", async () => {
+    const newGrade = await fetch(`${gradesApi}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        score: parseInt(newGradeInput.value),
+        courseId,
+        studentId,
+      }),
+    })
+      .then((res) => res.json())
+      .then(({ grade }) => grade)
+      .catch((error) => console.error(error));
+
+    const gradeList = await fetch(
+      `${gradesApi}/${studentId}?courseId=${courseId}`
+    )
+      .then((res) => res.json())
+      .then(({ grades }) => grades)
+      .catch((error) => console.error(error));
+
+    renderGradeList(gradeList);
+
+    newGradeInput.value = "";
+  });
+
+  newGradeInput.addEventListener("keyup", async (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      
+      const newGrade = await fetch(`${gradesApi}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          score: parseInt(newGradeInput.value),
+          courseId,
+          studentId,
+        }),
+      })
+        .then((res) => res.json())
+        .then(({ grade }) => grade)
+        .catch((error) => console.error(error));
+
+      const gradeList = await fetch(
+        `${gradesApi}/${studentId}?courseId=${courseId}`
+      )
+        .then((res) => res.json())
+        .then(({ grades }) => grades)
+        .catch((error) => console.error(error));
+
+      renderGradeList(gradeList);
+
+      newGradeInput.value = "";
+    }
+  });
+  newGradeInput.focus();
 }

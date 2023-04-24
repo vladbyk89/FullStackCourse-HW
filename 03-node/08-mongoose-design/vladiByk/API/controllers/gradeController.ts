@@ -16,7 +16,7 @@ export const getAllGrades = async (
   }
 };
 
-export const getGrade = async (
+export const getStudentGradesInCourse = async (
   req: Request,
   res: Response,
   next: NextFunction

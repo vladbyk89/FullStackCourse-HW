@@ -2,14 +2,14 @@ import express from "express";
 const gradeRouter = express.Router();
 import {
   getAllGrades,
-  getGrade,
+  getStudentGradesInCourse,
   createGrade,
   deleteGrade,
   updateGrade,
 } from "../controllers/gradeController";
 
 gradeRouter.route("/").get(getAllGrades).post(createGrade);
-gradeRouter.route("/:id").get(getGrade).patch(updateGrade).delete(deleteGrade);
+gradeRouter.route("/:id").get(getStudentGradesInCourse).patch(updateGrade).delete(deleteGrade);
 
 // module.exports = gradeRouter;
 export { gradeRouter };

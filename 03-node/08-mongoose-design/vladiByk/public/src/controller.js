@@ -231,6 +231,7 @@ function activateEditButtons(courseId) {
 }
 function renderGradeList(gradeList) {
     const studentName = gradeList[0].student.name;
+    const studentId = gradeList[0].student._id;
     const courseId = gradeList[0].course._id;
     const editWindow = document.querySelector(".editWindow");
     const listItemsHtml = gradeList
@@ -244,7 +245,7 @@ function renderGradeList(gradeList) {
         .join("");
     editWindow.innerHTML = `
       <h2>${studentName}</h2>
-      <ul class="gradesList">
+      <ul class="gradesList" id="${courseId}">
           <div><b>Grades</b><b>Edit</b></div>
         ${listItemsHtml}
       </ul>
@@ -262,6 +263,7 @@ function renderGradeList(gradeList) {
     });
     activateEditGradeButtons();
     activateDeleteGradeBtn();
+    activateAddGrade(courseId, studentId);
 }
 function activateEditGradeButtons() {
     const editGradeBtns = root.querySelectorAll(".fa-pen");
@@ -322,4 +324,57 @@ function activateDeleteGradeBtn() {
             .then(({ grade }) => grade)
             .catch((error) => console.error(error));
     })));
+}
+function activateAddGrade(courseId, studentId) {
+    const addGradeBtn = root.querySelector("#addGradeBtn");
+    const newGradeInput = root.querySelector("#newGradeInput");
+    addGradeBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+        const newGrade = yield fetch(`${gradesApi}`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                score: parseInt(newGradeInput.value),
+                courseId,
+                studentId,
+            }),
+        })
+            .then((res) => res.json())
+            .then(({ grade }) => grade)
+            .catch((error) => console.error(error));
+        const gradeList = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
+            .then((res) => res.json())
+            .then(({ grades }) => grades)
+            .catch((error) => console.error(error));
+        renderGradeList(gradeList);
+        newGradeInput.value = "";
+    }));
+    newGradeInput.addEventListener("keyup", (e) => __awaiter(this, void 0, void 0, function* () {
+        if (e.key === "Enter") {
+            const newGrade = yield fetch(`${gradesApi}`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    score: parseInt(newGradeInput.value),
+                    courseId,
+                    studentId,
+                }),
+            })
+                .then((res) => res.json())
+                .then(({ grade }) => grade)
+                .catch((error) => console.error(error));
+            const gradeList = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
+                .then((res) => res.json())
+                .then(({ grades }) => grades)
+                .catch((error) => console.error(error));
+            renderGradeList(gradeList);
+            newGradeInput.value = "";
+        }
+    }));
+    newGradeInput.focus();
 }
