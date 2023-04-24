@@ -179,7 +179,6 @@ async function handleAddStudentForm(
 ) {
   const newStudentName = addStudentForm.fullName.value;
   const newStudentGrade = addStudentForm.grade.value;
-  console.log(typeof parseInt(newStudentGrade));
 
   const createdStudent: StudentTemplate = await fetch(`${studentApi}`, {
     method: "POST",
@@ -305,6 +304,7 @@ function renderGradeList(gradeList: GradeTemplate[]) {
   });
 
   activateEditGradeButtons();
+  activateDeleteGradeBtn();
 }
 
 function activateEditGradeButtons() {
@@ -366,6 +366,37 @@ function activateEditGradeButtons() {
           const courseId = updatedGrade.course._id;
         }
       });
+    })
+  );
+}
+
+function activateDeleteGradeBtn() {
+  const deleteGradeBtns = root.querySelectorAll(
+    ".fa-square-minus"
+  ) as NodeListOf<HTMLIFrameElement>;
+
+  deleteGradeBtns.forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      const listEle = btn.parentElement?.parentElement as HTMLDataListElement;
+
+      const gradeId = listEle.id;
+
+      listEle.remove();
+
+      const deletedGrade: GradeTemplate = await fetch(
+        `${gradesApi}/${gradeId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then(({ grade }) => grade)
+        .catch((error) => console.error(error));
+
     })
   );
 }

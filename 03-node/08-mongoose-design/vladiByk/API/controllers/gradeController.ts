@@ -66,11 +66,11 @@ export const deleteGrade = async (
   next: NextFunction
 ) => {
   try {
-    const { id: gradeId } = req.body;
-    const grade = await Grade.deleteOne({ _id: gradeId });
+    const { id: gradeId } = req.params;
+    const grade = await Grade.findByIdAndDelete(gradeId);
     const grades = await Grade.find({});
 
-    res.status(200).send({ grades });
+    res.status(200).send({ grade });
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ error: error.message });

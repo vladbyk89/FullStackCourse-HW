@@ -67,10 +67,10 @@ const createGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 exports.createGrade = createGrade;
 const deleteGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: gradeId } = req.body;
-        const grade = yield GradeModel_1.default.deleteOne({ _id: gradeId });
+        const { id: gradeId } = req.params;
+        const grade = yield GradeModel_1.default.findByIdAndDelete(gradeId);
         const grades = yield GradeModel_1.default.find({});
-        res.status(200).send({ grades });
+        res.status(200).send({ grade });
     }
     catch (error) {
         console.error(error);
