@@ -328,31 +328,13 @@ function activateDeleteGradeBtn() {
 function activateAddGrade(courseId, studentId) {
     const addGradeBtn = root.querySelector("#addGradeBtn");
     const newGradeInput = root.querySelector("#newGradeInput");
-    addGradeBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
-        const newGrade = yield fetch(`${gradesApi}`, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                score: parseInt(newGradeInput.value),
-                courseId,
-                studentId,
-            }),
-        })
-            .then((res) => res.json())
-            .then(({ grade }) => grade)
-            .catch((error) => console.error(error));
-        const gradeList = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
-            .then((res) => res.json())
-            .then(({ grades }) => grades)
-            .catch((error) => console.error(error));
-        renderGradeList(gradeList);
-        newGradeInput.value = "";
-    }));
-    newGradeInput.addEventListener("keyup", (e) => __awaiter(this, void 0, void 0, function* () {
-        if (e.key === "Enter") {
+    addGradeBtn.addEventListener("click", addGrade);
+    newGradeInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter")
+            addGrade();
+    });
+    function addGrade() {
+        return __awaiter(this, void 0, void 0, function* () {
             const newGrade = yield fetch(`${gradesApi}`, {
                 method: "POST",
                 headers: {
@@ -374,7 +356,7 @@ function activateAddGrade(courseId, studentId) {
                 .catch((error) => console.error(error));
             renderGradeList(gradeList);
             newGradeInput.value = "";
-        }
-    }));
+        });
+    }
     newGradeInput.focus();
 }

@@ -409,7 +409,13 @@ function activateAddGrade(courseId: string, studentId: string) {
     "#newGradeInput"
   ) as HTMLInputElement;
 
-  addGradeBtn.addEventListener("click", async () => {
+  addGradeBtn.addEventListener("click", addGrade);
+
+  newGradeInput.addEventListener("keyup", (e: KeyboardEvent) => {
+    if (e.key === "Enter") addGrade();
+  });
+
+  async function addGrade() {
     const newGrade = await fetch(`${gradesApi}`, {
       method: "POST",
       headers: {
@@ -436,38 +442,7 @@ function activateAddGrade(courseId: string, studentId: string) {
     renderGradeList(gradeList);
 
     newGradeInput.value = "";
-  });
-
-  newGradeInput.addEventListener("keyup", async (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      
-      const newGrade = await fetch(`${gradesApi}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          score: parseInt(newGradeInput.value),
-          courseId,
-          studentId,
-        }),
-      })
-        .then((res) => res.json())
-        .then(({ grade }) => grade)
-        .catch((error) => console.error(error));
-
-      const gradeList = await fetch(
-        `${gradesApi}/${studentId}?courseId=${courseId}`
-      )
-        .then((res) => res.json())
-        .then(({ grades }) => grades)
-        .catch((error) => console.error(error));
-
-      renderGradeList(gradeList);
-
-      newGradeInput.value = "";
-    }
-  });
+  }
+  
   newGradeInput.focus();
 }
