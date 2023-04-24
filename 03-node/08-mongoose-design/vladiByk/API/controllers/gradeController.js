@@ -47,14 +47,17 @@ const createGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         const student = yield StudentModel_1.default.findById(studentId);
         const course = yield CourseModel_1.default.findById(courseId);
         if (student || course) {
-            yield GradeModel_1.default.create({
+            const grade = yield GradeModel_1.default.create({
                 score,
                 course: course,
                 student: student,
             });
+            res.status(200).json({ grade });
         }
-        const grades = yield GradeModel_1.default.find({});
-        res.status(200).json({ grades });
+        else {
+            const grades = yield GradeModel_1.default.find({});
+            res.status(200).json({ grades });
+        }
     }
     catch (error) {
         console.error(error);

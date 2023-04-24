@@ -113,31 +113,34 @@ function renderStudentsPage(studentsRootHtml, courseId) {
     <form id="addStudentForm">
         <label for="name"
         >Full name:
-        <input type="text" name="fullName" id="name" placeholder="John Doe"
+        <input type="text" name="fullName" id="name" placeholder="John Doe" required
         /></label>
         <label for="grade"
-        >Grade: <input type="number" name="grade" id="grade" placeholder="88"
+        >Grade: <input type="number" name="grade" id="grade" placeholder="88" required
         /></label>
         <button type="submit">Add</button>
     </form>
     <div class="editWindow"></div>
   `;
-        // const deleteButtons = document.querySelectorAll(
-        //   ".fa-trash-can"
-        // ) as NodeListOf<HTMLElement>;
-        // deleteButtons.forEach((btn) =>
-        //   btn.addEventListener("click", async () => {
-        //     const id = btn.parentElement?.parentElement?.id;
-        //     await fetch(`${studentApi}/${id}`, {
-        //       method: "DELETE",
-        //       headers: {
-        //         Accept: "application/json",
-        //         "Content-Type": "application/json",
-        //       },
-        //     }).catch((error) => console.error(error));
-        //     displayStudents();
-        //   })
-        // );
+        const addStudentForm = root.querySelector("#addStudentForm");
+        addStudentForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            handleAddStudentForm(addStudentForm, courseId);
+        });
+        const deleteButtons = document.querySelectorAll(".fa-trash-can");
+        deleteButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const studentDiv = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement;
+            const id = studentDiv.id;
+            studentDiv.remove();
+            yield fetch(`${studentApi}/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            }).catch((error) => console.error(error));
+        })));
     });
 }
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -149,7 +152,7 @@ const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function
             const newStudent = new Student(student.name, student._id, courseId);
             const studentAvgScore = yield newStudent.getAverageInCourse(courseId);
             studentsRootHtml += `
-          <div class="studentDiv">
+          <div class="studentDiv" id="${student._id}">
               <b>${student.name}</b>
               <span>${studentAvgScore}</span>
               <div class="crudIcons">
@@ -165,59 +168,39 @@ const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function
         console.error(error);
     }
 });
-function buildStudentHtml() {
-    return __awaiter(this, void 0, void 0, function* () { });
+function handleAddStudentForm(addStudentForm, courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const newStudentName = addStudentForm.fullName.value;
+        const newStudentGrade = addStudentForm.grade.value;
+        console.log(typeof parseInt(newStudentGrade));
+        const createdStudent = yield fetch(`${studentApi}`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: newStudentName, courseId }),
+        })
+            .then((res) => res.json())
+            .then(({ student }) => student)
+            .catch((error) => console.error(error));
+        console.log(createdStudent);
+        const createdGrade = yield fetch(`${gradesApi}`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                score: parseInt(newStudentGrade),
+                courseId,
+                studentId: createdStudent._id,
+            }),
+        })
+            .then((res) => res.json())
+            .then(({ grade }) => grade)
+            .catch((error) => console.error(error));
+        console.log(createdGrade);
+        displayStudents(courseId);
+    });
 }
-// async function getAverageInCourse(studentId: string, courseId: string) {
-//   const grades: number[] = await fetch(
-//     `${gradesApi}/${studentId}?courseId=${courseId}`
-//   )
-//     .then((res) => res.json())
-//     .then(({ grades }) => grades.map((grade: GradeTemplate) => grade.score))
-//     .catch((error) => console.error(error));
-//   console.log(grades);
-//   const gradesAverage: number =
-//     grades.reduce((a, b) => a + b, 0) / grades.length;
-//   console.log(gradesAverage);
-// }
-// async function displayTeacherCourses(e: Event) {
-//   e.preventDefault();
-//   const teacherId = teacherIdInput.value;
-//   const courseList = await fetch(`/api/v1/teachers/${teacherId}`, {
-//     method: "GET",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//   })
-//     .then((res) => res.json())
-//     .then((data) => data)
-//     .catch((error) => console.error(error));
-//   console.log(courseList);
-//   teacherIdInput.value = "";
-// }
-// async function handleAddStudentForm(e: Event) {
-//   e.preventDefault();
-//   const newStudentName = addStudentForm.fullName.value;
-//   const newStudentGrade = addStudentForm.grade.value;
-//   const student = await fetch(`${studentApi}`, {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ name: newStudentName }),
-//   })
-//     .then((res) => res.json())
-//     .then(({ student }) => new Student(student.name))
-//     .catch((error) => console.error(error));
-//   await fetch(`${gradesApi}`, {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ grade: newStudentGrade }),
-//   }).catch((error) => console.error(error));
-//   displayStudents();
-// }

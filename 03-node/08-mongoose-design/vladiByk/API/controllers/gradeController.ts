@@ -44,14 +44,16 @@ export const createGrade = async (
     const student = await Student.findById(studentId);
     const course = await Course.findById(courseId);
     if (student || course) {
-      await Grade.create({
+      const grade = await Grade.create({
         score,
         course: course,
         student: student,
       });
+      res.status(200).json({ grade });
+    } else {
+      const grades = await Grade.find({});
+      res.status(200).json({ grades });
     }
-    const grades = await Grade.find({});
-    res.status(200).json({ grades });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });
