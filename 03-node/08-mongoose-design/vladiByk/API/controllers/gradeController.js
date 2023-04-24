@@ -81,10 +81,10 @@ exports.deleteGrade = deleteGrade;
 const updateGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: gradeId } = req.params;
-        const data = req.body;
-        const grades = yield GradeModel_1.default.find({});
-        const grade = yield GradeModel_1.default.findById({ _id: gradeId });
-        res.status(200).send("Grade updated...");
+        const { newScore } = req.body;
+        yield GradeModel_1.default.findByIdAndUpdate(gradeId, { score: newScore });
+        const grade = yield GradeModel_1.default.findById(gradeId);
+        res.status(200).json({ grade });
     }
     catch (error) {
         console.error(error);

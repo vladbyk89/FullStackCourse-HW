@@ -84,10 +84,10 @@ export const updateGrade = async (
 ) => {
   try {
     const { id: gradeId } = req.params;
-    const data = req.body;
-    const grades = await Grade.find({});
-    const grade = await Grade.findById({ _id: gradeId });
-    res.status(200).send("Grade updated...");
+    const { newScore } = req.body;
+    await Grade.findByIdAndUpdate(gradeId, { score: newScore });
+    const grade = await Grade.findById(gradeId);
+    res.status(200).json({ grade });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

@@ -256,23 +256,22 @@ async function activateEditButtons(courseId: string) {
         .then(({ grades }) => grades)
         .catch((error) => console.error(error));
 
-      const gradeArray = grades.map((grade) => grade.score);
-
-      const studentName = grades[0].student.name;
-
-      renderGradeList(gradeArray, studentName);
+      renderGradeList(grades);
     })
   );
 }
 
-function renderGradeList(gradeList: number[], studentName: string) {
+function renderGradeList(gradeList: GradeTemplate[]) {
+  const studentName = gradeList[0].student.name;
+  const courseId = gradeList[0].course._id;
+
   const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
 
   const listItemsHtml = gradeList
     .map(
       (grade) =>
-        `<li>
-    <span>${grade}</span>
+        `<li id="${grade._id}">
+    <span>${grade.score}</span>
     <div class="listIcons">
       <i class="fa-regular fa-square-minus"></i>
       <i class="fa-solid fa-pen"></i>
@@ -295,4 +294,78 @@ function renderGradeList(gradeList: number[], studentName: string) {
     `;
 
   editWindow.style.display = "flex";
+
+  const closeEditWindowBtn = root.querySelector(
+    "#closeEditWindow"
+  ) as HTMLButtonElement;
+
+  closeEditWindowBtn.addEventListener("click", () => {
+    displayStudents(courseId);
+    editWindow.style.display = "none";
+  });
+
+  activateEditGradeButtons();
+}
+
+function activateEditGradeButtons() {
+  const editGradeBtns = root.querySelectorAll(
+    ".fa-pen"
+  ) as NodeListOf<HTMLIFrameElement>;
+
+  editGradeBtns.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const listEle = btn.parentElement?.parentElement as HTMLDataListElement;
+
+      const gradeId = listEle.id;
+
+      const iconDiv = listEle.querySelector(".listIcons") as HTMLDivElement;
+
+      const spanEle = listEle.firstElementChild as HTMLSpanElement;
+
+      const gradeInputEle = document.createElement("input") as HTMLInputElement;
+
+      gradeInputEle.setAttribute("type", "number");
+      gradeInputEle.value = spanEle.innerHTML;
+
+      listEle.replaceChild(gradeInputEle, spanEle);
+
+      gradeInputEle.focus();
+
+      iconDiv.style.display = "none";
+
+      gradeInputEle.addEventListener("keyup", async (e) => {
+        if (e.key === "Enter") {
+          if (
+            Number(gradeInputEle.value) > 100 ||
+            Number(gradeInputEle.value) < 0 ||
+            !Number(gradeInputEle.value)
+          )
+            return alert("Check grade input");
+
+          spanEle.textContent = gradeInputEle.value;
+          listEle.replaceChild(spanEle, gradeInputEle);
+          iconDiv.style.display = "flex";
+
+          const updatedGrade: GradeTemplate = await fetch(
+            `${gradesApi}/${gradeId}`,
+            {
+              method: "PATCH",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                newScore: parseInt(gradeInputEle.value),
+              }),
+            }
+          )
+            .then((res) => res.json())
+            .then(({ grade }) => grade)
+            .catch((error) => console.error(error));
+
+          const courseId = updatedGrade.course._id;
+        }
+      });
+    })
+  );
 }
