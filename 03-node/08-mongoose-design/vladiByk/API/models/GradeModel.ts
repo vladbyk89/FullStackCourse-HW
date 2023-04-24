@@ -9,9 +9,20 @@ interface Grade {
 
 export const GradeSchema: Schema = new Schema(
   {
-    score: Number,
-    course: CourseSchema,
-    student: StudentSchema,
+    score: {
+      type: Number,
+      required: true,
+      max: 100,
+      min: 0,
+    },
+    course: {
+      type: CourseSchema,
+      required: true,
+    },
+    student: {
+      type: StudentSchema,
+      required: true,
+    },
   },
   {
     versionKey: false,

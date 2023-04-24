@@ -104,43 +104,36 @@ function renderCoursesRoot(coursesList) {
 }
 function renderStudentsPage(studentsRootHtml, courseId) {
     return __awaiter(this, void 0, void 0, function* () {
-        root.innerHTML = `
-    <h1>Student list</h1>
-    <div id="studentsRoot">
-      ${studentsRootHtml}
-    </div>
-    <h4>Add student</h4>
-    <form id="addStudentForm">
-        <label for="name"
-        >Full name:
-        <input type="text" name="fullName" id="name" placeholder="John Doe" required
-        /></label>
-        <label for="grade"
-        >Grade: <input type="number" name="grade" id="grade" placeholder="88" required
-        /></label>
-        <button type="submit">Add</button>
-    </form>
-    <div class="editWindow"></div>
-  `;
-        const addStudentForm = root.querySelector("#addStudentForm");
-        addStudentForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            handleAddStudentForm(addStudentForm, courseId);
-        });
-        const deleteButtons = document.querySelectorAll(".fa-trash-can");
-        deleteButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
-            var _a;
-            const studentDiv = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement;
-            const id = studentDiv.id;
-            studentDiv.remove();
-            yield fetch(`${studentApi}/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-            }).catch((error) => console.error(error));
-        })));
+        try {
+            root.innerHTML = `
+      <h1>Student list</h1>
+      <div id="studentsRoot">
+        ${studentsRootHtml}
+      </div>
+      <h4>Add student</h4>
+      <form id="addStudentForm">
+          <label for="name"
+          >Full name:
+          <input type="text" name="fullName" id="name" placeholder="John Doe" required
+          /></label>
+          <label for="grade"
+          >Grade: <input type="number" name="grade" id="grade" placeholder="88" min="0" max="100" required
+          /></label>
+          <button type="submit">Add</button>
+      </form>
+      <div class="editWindow"></div>
+    `;
+            const addStudentForm = root.querySelector("#addStudentForm");
+            addStudentForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                handleAddStudentForm(addStudentForm, courseId);
+            });
+            activateDeleteButtons();
+            activateEditButtons(courseId);
+        }
+        catch (error) {
+            console.log(error);
+        }
     });
 }
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -184,7 +177,6 @@ function handleAddStudentForm(addStudentForm, courseId) {
             .then((res) => res.json())
             .then(({ student }) => student)
             .catch((error) => console.error(error));
-        console.log(createdStudent);
         const createdGrade = yield fetch(`${gradesApi}`, {
             method: "POST",
             headers: {
@@ -200,7 +192,68 @@ function handleAddStudentForm(addStudentForm, courseId) {
             .then((res) => res.json())
             .then(({ grade }) => grade)
             .catch((error) => console.error(error));
-        console.log(createdGrade);
         displayStudents(courseId);
     });
+}
+function activateDeleteButtons() {
+    try {
+        const deleteButtons = document.querySelectorAll(".fa-trash-can");
+        deleteButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const studentDiv = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement;
+            const id = studentDiv.id;
+            studentDiv.remove();
+            yield fetch(`${studentApi}/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            }).catch((error) => console.error(error));
+        })));
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+function activateEditButtons(courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const editButtons = root.querySelectorAll(".fa-pen-to-square");
+        editButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
+            const studentId = (_b = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.id;
+            const grades = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
+                .then((res) => res.json())
+                .then(({ grades }) => grades)
+                .catch((error) => console.error(error));
+            const gradeArray = grades.map((grade) => grade.score);
+            const studentName = grades[0].student.name;
+            renderGradeList(gradeArray, studentName);
+        })));
+    });
+}
+function renderGradeList(gradeList, studentName) {
+    const editWindow = document.querySelector(".editWindow");
+    const listItemsHtml = gradeList
+        .map((grade) => `<li>
+    <span>${grade}</span>
+    <div class="listIcons">
+      <i class="fa-regular fa-square-minus"></i>
+      <i class="fa-solid fa-pen"></i>
+    </div>
+  </li>`)
+        .join("");
+    editWindow.innerHTML = `
+      <h2>${studentName}</h2>
+      <ul class="gradesList">
+          <div><b>Grades</b><b>Edit</b></div>
+        ${listItemsHtml}
+      </ul>
+      <label for="newGrade">
+        <input type="number" id="newGradeInput" placeholder="New grade..." />
+        <input type="submit" id="addGradeBtn"/>
+      </label>
+      <button id="closeEditWindow">Done</button>
+    `;
+    editWindow.style.display = "flex";
 }

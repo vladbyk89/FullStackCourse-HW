@@ -25,7 +25,6 @@ class Student {
 
       const gradesAverage = grades.reduce((a, b) => a + b, 0) / grades.length;
 
-
       return gradesAverage;
     } catch (error) {
       console.log(error);
@@ -35,6 +34,7 @@ class Student {
 
 interface StudentTemplate {
   name: string;
+  course: CourseTemplate;
   _id: string;
 }
 
@@ -52,7 +52,7 @@ class Course {
 
 interface CourseTemplate {
   name: string;
-  teachers: [string];
+  teachers: [TeacherTemplate];
   _id: string;
 }
 
@@ -66,7 +66,7 @@ class Grade {
 
 interface GradeTemplate {
   score: number;
-  course: string;
-  student: string;
+  course: CourseTemplate;
+  student: StudentTemplate;
   _id: string;
 }

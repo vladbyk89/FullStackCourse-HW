@@ -1,26 +1,6 @@
+async function renderGradeListXX(studentID: string) {
+  const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
 
-
-const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
-
-const openEditWindow = async (id: string) => {
-  const studentList = await fetch(studentApi)
-    .then((res) => res.json())
-    .then(({ students }) =>
-      students.map(
-        (student: StudentTemplate) =>
-          new Student(student.name, student._id)
-      )
-    );
-  editWindow.style.display = "flex";
-
-  const findStudent: Student = studentList.find(
-    (student: Student) => student.id == id
-  );
-  if (!findStudent) return alert("User not found");
-  renderGradeList(findStudent.id);
-};
-
-async function renderGradeList(studentID: string) {
   const student = await fetch(`${studentApi}/${studentID}`, {
     method: "GET",
     headers: {
@@ -29,35 +9,10 @@ async function renderGradeList(studentID: string) {
     },
   })
     .then((res) => res.json())
-    .then(
-      ({ student }) => new Student(student.name, student.id)
-    )
+    .then(({ student }) => new Student(student.name, student.id))
     .catch((error) => console.error(error));
   if (!student) return;
-  // const listItemsHtml = student.grades
-  //   .map(
-  //     (grade) =>
-  //       `<li>
-  //   <span>${grade}</span>
-  //   <div class="listIcons">
-  //     <i class="fa-regular fa-square-minus"></i>
-  //     <i class="fa-solid fa-pen"></i>
-  //   </div>
-  // </li>`
-  //   )
-  //   .join("");
-  // editWindow.innerHTML = `
-  // <h2>${student.name}</h2>
-  // <ul class="gradesList">
-  //     <div><b>Grades</b><b>Edit</b></div>
-  //   ${listItemsHtml}
-  // </ul>
-  // <label for="newGrade">
-  //   <input type="number" id="newGradeInput" placeholder="New grade..." />
-  //   <input type="submit" id="addGradeBtn"/>
-  // </label>
-  // <button id="closeEditWindow">Done</button>
-  // `;
+    
   const editGradeBtns = editWindow.querySelectorAll(
     ".fa-pen"
   ) as NodeListOf<HTMLIFrameElement>;
@@ -124,7 +79,6 @@ function deleteGrade(btnsArr: Element[], studentToUpdate: Student) {
       //   },
       //   body: JSON.stringify({ grade, gradeIndex, delete: true }),
       // }).catch((error) => console.error(error));
-
       // displayStudents();
     })
   );
@@ -163,19 +117,19 @@ async function updateGrade(input: HTMLInputElement, studentID: string) {
     body: JSON.stringify({ grade: input.value, delete: false }),
   }).catch((error) => console.error(error));
 
-  renderGradeList(studentID);
+  renderGradeListXX(studentID);
   // displayStudents();
 
   input.value = "";
 }
 
-window.addEventListener("click", (e: Event) => {
-  const target = e.target as HTMLElement;
-  if (target.id === "closeEditWindow") {
-    editWindow.style.display = "none";
-  }
-  if (target.classList.contains("fa-pen-to-square")) {
-    const id = target.parentElement?.parentElement?.id as string;
-    openEditWindow(id);
-  }
-});
+// window.addEventListener("click", (e: Event) => {
+//   const target = e.target as HTMLElement;
+//   if (target.id === "closeEditWindow") {
+//     editWindow.style.display = "none";
+//   }
+//   if (target.classList.contains("fa-pen-to-square")) {
+//     const id = target.parentElement?.parentElement?.id as string;
+//     openEditWindow(id);
+//   }
+// });

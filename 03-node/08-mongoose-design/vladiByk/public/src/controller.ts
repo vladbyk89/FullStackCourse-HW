@@ -109,55 +109,40 @@ function renderCoursesRoot(coursesList: CourseTemplate[]) {
 }
 
 async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
-  root.innerHTML = `
-    <h1>Student list</h1>
-    <div id="studentsRoot">
-      ${studentsRootHtml}
-    </div>
-    <h4>Add student</h4>
-    <form id="addStudentForm">
-        <label for="name"
-        >Full name:
-        <input type="text" name="fullName" id="name" placeholder="John Doe" required
-        /></label>
-        <label for="grade"
-        >Grade: <input type="number" name="grade" id="grade" placeholder="88" required
-        /></label>
-        <button type="submit">Add</button>
-    </form>
-    <div class="editWindow"></div>
-  `;
+  try {
+    root.innerHTML = `
+      <h1>Student list</h1>
+      <div id="studentsRoot">
+        ${studentsRootHtml}
+      </div>
+      <h4>Add student</h4>
+      <form id="addStudentForm">
+          <label for="name"
+          >Full name:
+          <input type="text" name="fullName" id="name" placeholder="John Doe" required
+          /></label>
+          <label for="grade"
+          >Grade: <input type="number" name="grade" id="grade" placeholder="88" min="0" max="100" required
+          /></label>
+          <button type="submit">Add</button>
+      </form>
+      <div class="editWindow"></div>
+    `;
 
-  const addStudentForm = root.querySelector(
-    "#addStudentForm"
-  ) as HTMLFormElement;
+    const addStudentForm = root.querySelector(
+      "#addStudentForm"
+    ) as HTMLFormElement;
 
-  addStudentForm.addEventListener("submit", (e: Event) => {
-    e.preventDefault();
-    handleAddStudentForm(addStudentForm, courseId);
-  });
+    addStudentForm.addEventListener("submit", (e: Event) => {
+      e.preventDefault();
+      handleAddStudentForm(addStudentForm, courseId);
+    });
 
-  const deleteButtons = document.querySelectorAll(
-    ".fa-trash-can"
-  ) as NodeListOf<HTMLElement>;
-
-  deleteButtons.forEach((btn) =>
-    btn.addEventListener("click", async () => {
-      const studentDiv = btn.parentElement?.parentElement as HTMLDivElement;
-
-      const id = studentDiv.id;
-
-      studentDiv.remove();
-
-      await fetch(`${studentApi}/${id}`, {
-        method: "DELETE",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }).catch((error) => console.error(error));
-    })
-  );
+    activateDeleteButtons();
+    activateEditButtons(courseId);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 const displayStudents = async (courseId: string) => {
@@ -207,7 +192,6 @@ async function handleAddStudentForm(
     .then((res) => res.json())
     .then(({ student }) => student)
     .catch((error) => console.error(error));
-  console.log(createdStudent);
 
   const createdGrade = await fetch(`${gradesApi}`, {
     method: "POST",
@@ -224,7 +208,91 @@ async function handleAddStudentForm(
     .then((res) => res.json())
     .then(({ grade }) => grade)
     .catch((error) => console.error(error));
-  console.log(createdGrade);
 
   displayStudents(courseId);
+}
+
+function activateDeleteButtons() {
+  try {
+    const deleteButtons = document.querySelectorAll(
+      ".fa-trash-can"
+    ) as NodeListOf<HTMLElement>;
+
+    deleteButtons.forEach((btn) =>
+      btn.addEventListener("click", async () => {
+        const studentDiv = btn.parentElement?.parentElement as HTMLDivElement;
+
+        const id = studentDiv.id;
+
+        studentDiv.remove();
+
+        await fetch(`${studentApi}/${id}`, {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }).catch((error) => console.error(error));
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function activateEditButtons(courseId: string) {
+  const editButtons = root.querySelectorAll(
+    ".fa-pen-to-square"
+  ) as NodeListOf<HTMLElement>;
+
+  editButtons.forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      const studentId = btn.parentElement?.parentElement?.id;
+
+      const grades: GradeTemplate[] = await fetch(
+        `${gradesApi}/${studentId}?courseId=${courseId}`
+      )
+        .then((res) => res.json())
+        .then(({ grades }) => grades)
+        .catch((error) => console.error(error));
+
+      const gradeArray = grades.map((grade) => grade.score);
+
+      const studentName = grades[0].student.name;
+
+      renderGradeList(gradeArray, studentName);
+    })
+  );
+}
+
+function renderGradeList(gradeList: number[], studentName: string) {
+  const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
+
+  const listItemsHtml = gradeList
+    .map(
+      (grade) =>
+        `<li>
+    <span>${grade}</span>
+    <div class="listIcons">
+      <i class="fa-regular fa-square-minus"></i>
+      <i class="fa-solid fa-pen"></i>
+    </div>
+  </li>`
+    )
+    .join("");
+
+  editWindow.innerHTML = `
+      <h2>${studentName}</h2>
+      <ul class="gradesList">
+          <div><b>Grades</b><b>Edit</b></div>
+        ${listItemsHtml}
+      </ul>
+      <label for="newGrade">
+        <input type="number" id="newGradeInput" placeholder="New grade..." />
+        <input type="submit" id="addGradeBtn"/>
+      </label>
+      <button id="closeEditWindow">Done</button>
+    `;
+
+  editWindow.style.display = "flex";
 }

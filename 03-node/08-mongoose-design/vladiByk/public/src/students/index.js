@@ -8,19 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const editWindow = document.querySelector(".editWindow");
-const openEditWindow = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const studentList = yield fetch(studentApi)
-        .then((res) => res.json())
-        .then(({ students }) => students.map((student) => new Student(student.name, student._id)));
-    editWindow.style.display = "flex";
-    const findStudent = studentList.find((student) => student.id == id);
-    if (!findStudent)
-        return alert("User not found");
-    renderGradeList(findStudent.id);
-});
-function renderGradeList(studentID) {
+function renderGradeListXX(studentID) {
     return __awaiter(this, void 0, void 0, function* () {
+        const editWindow = document.querySelector(".editWindow");
         const student = yield fetch(`${studentApi}/${studentID}`, {
             method: "GET",
             headers: {
@@ -33,30 +23,6 @@ function renderGradeList(studentID) {
             .catch((error) => console.error(error));
         if (!student)
             return;
-        // const listItemsHtml = student.grades
-        //   .map(
-        //     (grade) =>
-        //       `<li>
-        //   <span>${grade}</span>
-        //   <div class="listIcons">
-        //     <i class="fa-regular fa-square-minus"></i>
-        //     <i class="fa-solid fa-pen"></i>
-        //   </div>
-        // </li>`
-        //   )
-        //   .join("");
-        // editWindow.innerHTML = `
-        // <h2>${student.name}</h2>
-        // <ul class="gradesList">
-        //     <div><b>Grades</b><b>Edit</b></div>
-        //   ${listItemsHtml}
-        // </ul>
-        // <label for="newGrade">
-        //   <input type="number" id="newGradeInput" placeholder="New grade..." />
-        //   <input type="submit" id="addGradeBtn"/>
-        // </label>
-        // <button id="closeEditWindow">Done</button>
-        // `;
         const editGradeBtns = editWindow.querySelectorAll(".fa-pen");
         const editBtnsArr = Array.from(editGradeBtns);
         editGradeBtnEvent(editBtnsArr, student);
@@ -136,19 +102,18 @@ function updateGrade(input, studentID) {
             },
             body: JSON.stringify({ grade: input.value, delete: false }),
         }).catch((error) => console.error(error));
-        renderGradeList(studentID);
+        renderGradeListXX(studentID);
         // displayStudents();
         input.value = "";
     });
 }
-window.addEventListener("click", (e) => {
-    var _a, _b;
-    const target = e.target;
-    if (target.id === "closeEditWindow") {
-        editWindow.style.display = "none";
-    }
-    if (target.classList.contains("fa-pen-to-square")) {
-        const id = (_b = (_a = target.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.id;
-        openEditWindow(id);
-    }
-});
+// window.addEventListener("click", (e: Event) => {
+//   const target = e.target as HTMLElement;
+//   if (target.id === "closeEditWindow") {
+//     editWindow.style.display = "none";
+//   }
+//   if (target.classList.contains("fa-pen-to-square")) {
+//     const id = target.parentElement?.parentElement?.id as string;
+//     openEditWindow(id);
+//   }
+// });
