@@ -149,7 +149,7 @@ const displayStudents = async (courseId: string) => {
   try {
     let studentsRootHtml: string = " ";
 
-    await fetch(`${studentApi}/${courseId}`)
+    await fetch(`${studentApi}/inCourse/${courseId}`)
       .then((res) => res.json())
       .then(({ students }) =>
         students.forEach(async (student: StudentTemplate) => {

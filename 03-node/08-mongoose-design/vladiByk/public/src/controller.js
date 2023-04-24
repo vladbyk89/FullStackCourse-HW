@@ -139,7 +139,7 @@ function renderStudentsPage(studentsRootHtml, courseId) {
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let studentsRootHtml = " ";
-        yield fetch(`${studentApi}/${courseId}`)
+        yield fetch(`${studentApi}/inCourse/${courseId}`)
             .then((res) => res.json())
             .then(({ students }) => students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
             const newStudent = new Student(student.name, student._id, courseId);

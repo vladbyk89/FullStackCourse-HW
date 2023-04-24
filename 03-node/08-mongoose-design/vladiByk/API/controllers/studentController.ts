@@ -21,7 +21,7 @@ export const getStudentsInCourse = async (
   next: NextFunction
 ) => {
   try {
-    const { id: courseId } = req.params;
+    const { courseId } = req.params;
     const course = await Course.findById({ _id: courseId });
     const students = await Student.find({ courses: course });
     res.status(200).send({ students });
@@ -45,6 +45,20 @@ export const createStudent = async (
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });
+  }
+};
+
+export const getStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: studentId } = req.params;
+    const student = await Student.findById(studentId);
+    res.status(200).json({ student });
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -72,18 +86,8 @@ export const updateStudent = async (
 ) => {
   try {
     const { id: studentId } = req.params;
-    const data = req.body;
-    const students = await Student.find({});
     const student = await Student.findById({ _id: studentId });
-    if (!student) return res.status(404).send({ ok: false });
-    if (!data.delete) {
-      student.grades.push(data.grade);
-      await student.save();
-      return res.status(201).json({ students });
-    }
-    student.grades.splice(data.gradeIndex, 1);
-    await student.save();
-    res.status(201).json({ students });
+    res.status(201).json({ student });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

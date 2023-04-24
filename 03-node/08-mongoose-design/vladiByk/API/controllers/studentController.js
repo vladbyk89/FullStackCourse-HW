@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateStudent = exports.deleteStudent = exports.createStudent = exports.getStudentsInCourse = exports.getAllStudents = void 0;
+exports.updateStudent = exports.deleteStudent = exports.getStudent = exports.createStudent = exports.getStudentsInCourse = exports.getAllStudents = void 0;
 const StudentModel_1 = __importDefault(require("../models/StudentModel"));
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
 const getAllStudents = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,7 +27,7 @@ const getAllStudents = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.getAllStudents = getAllStudents;
 const getStudentsInCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: courseId } = req.params;
+        const { courseId } = req.params;
         const course = yield CourseModel_1.default.findById({ _id: courseId });
         const students = yield StudentModel_1.default.find({ courses: course });
         res.status(200).send({ students });
@@ -52,6 +52,17 @@ const createStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createStudent = createStudent;
+const getStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: studentId } = req.params;
+        const student = yield StudentModel_1.default.findById(studentId);
+        res.status(200).json({ student });
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
+exports.getStudent = getStudent;
 const deleteStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: studentId } = req.params;
@@ -68,19 +79,8 @@ exports.deleteStudent = deleteStudent;
 const updateStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: studentId } = req.params;
-        const data = req.body;
-        const students = yield StudentModel_1.default.find({});
         const student = yield StudentModel_1.default.findById({ _id: studentId });
-        if (!student)
-            return res.status(404).send({ ok: false });
-        if (!data.delete) {
-            student.grades.push(data.grade);
-            yield student.save();
-            return res.status(201).json({ students });
-        }
-        student.grades.splice(data.gradeIndex, 1);
-        yield student.save();
-        res.status(201).json({ students });
+        res.status(201).json({ student });
     }
     catch (error) {
         console.error(error);

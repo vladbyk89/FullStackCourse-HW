@@ -2,6 +2,7 @@ import express from "express";
 const studentRouter = express.Router();
 import {
   getAllStudents,
+  getStudent,
   getStudentsInCourse,
   createStudent,
   deleteStudent,
@@ -9,11 +10,14 @@ import {
 } from "../controllers/studentController";
 
 studentRouter.route("/").get(getAllStudents).post(createStudent);
+
 studentRouter
   .route("/:id")
-  .get(getStudentsInCourse)
+  .get(getStudent)
   .patch(updateStudent)
   .delete(deleteStudent);
+  
+studentRouter.route("/inCourse/:courseId").get(getStudentsInCourse);
 
 // module.exports = studentRouter;
 export { studentRouter };
