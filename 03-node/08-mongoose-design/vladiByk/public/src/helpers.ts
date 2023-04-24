@@ -27,3 +27,17 @@ async function createGrade(score: number, courseId: string, studentId: string) {
     }),
   }).catch((error) => console.error(error));
 }
+
+async function getTeacher(teacherId: string) {
+  return await fetch(`${teacherApi}/${teacherId}`)
+    .then((res) => res.json())
+    .then(({ teacher }) => teacher)
+    .catch((error) => console.error(error));
+}
+
+async function getTeacherCourses(teacherId: string) {
+  return fetch(`${courseApi}/${teacherId}`)
+    .then((res) => res.json())
+    .then(({ courses }) => courses)
+    .catch((error) => console.error(error));
+}

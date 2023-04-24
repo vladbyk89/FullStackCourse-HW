@@ -39,7 +39,6 @@ function checkTeacherId(teacherId) {
                 .catch((error) => console.error(error));
             if (!teacher)
                 throw new Error("Teacher not found!");
-            console.log(teacher);
             renderCoursePage(teacher._id);
         }
         catch (error) {
@@ -49,12 +48,10 @@ function checkTeacherId(teacherId) {
 }
 function renderCoursePage(teacherId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const courses = yield fetch(`${courseApi}/${teacherId}`)
-            .then((res) => res.json())
-            .then(({ courses }) => courses)
-            .catch((error) => console.error(error));
+        const teacher = yield getTeacher(teacherId);
+        const courses = yield getTeacherCourses(teacherId);
         root.innerHTML = `
-    <h1>Available courses</h1>
+    <h1>${teacher.name} courses</h1>
     <div id="coursesRoot">
     </div>
     <form id="addCourseForm">
@@ -74,7 +71,6 @@ function renderCoursePage(teacherId) {
         addCourseForm.addEventListener("submit", (e) => {
             e.preventDefault();
             const courseName = addCourseForm.courseName.value;
-            console.log(courseName);
             addCourse(courseName, teacherId);
         });
         const coursesBtn = root.querySelectorAll(".course");

@@ -40,3 +40,19 @@ function createGrade(score, courseId, studentId) {
         }).catch((error) => console.error(error));
     });
 }
+function getTeacher(teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield fetch(`${teacherApi}/${teacherId}`)
+            .then((res) => res.json())
+            .then(({ teacher }) => teacher)
+            .catch((error) => console.error(error));
+    });
+}
+function getTeacherCourses(teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(`${courseApi}/${teacherId}`)
+            .then((res) => res.json())
+            .then(({ courses }) => courses)
+            .catch((error) => console.error(error));
+    });
+}

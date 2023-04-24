@@ -35,7 +35,6 @@ async function checkTeacherId(teacherId: string) {
       .then(({ teacher }) => teacher)
       .catch((error) => console.error(error));
     if (!teacher) throw new Error("Teacher not found!");
-    console.log(teacher);
     renderCoursePage(teacher._id);
   } catch (error) {
     console.error(error);
@@ -43,13 +42,12 @@ async function checkTeacherId(teacherId: string) {
 }
 
 async function renderCoursePage(teacherId: string) {
-  const courses: CourseTemplate[] = await fetch(`${courseApi}/${teacherId}`)
-    .then((res) => res.json())
-    .then(({ courses }) => courses)
-    .catch((error) => console.error(error));
+  const teacher: TeacherTemplate = await getTeacher(teacherId);
+
+  const courses: CourseTemplate[] = await getTeacherCourses(teacherId)
 
   root.innerHTML = `
-    <h1>Available courses</h1>
+    <h1>${teacher.name} courses</h1>
     <div id="coursesRoot">
     </div>
     <form id="addCourseForm">
@@ -71,7 +69,6 @@ async function renderCoursePage(teacherId: string) {
   addCourseForm.addEventListener("submit", (e: Event) => {
     e.preventDefault();
     const courseName = addCourseForm.courseName.value;
-    console.log(courseName);
     addCourse(courseName, teacherId);
   });
 
