@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getTeacherCourses = exports.getAllCourses = void 0;
+exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getTeacherCourses = exports.getAllCourses = void 0;
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
 const TeacherModel_1 = __importDefault(require("../models/TeacherModel"));
 const getAllCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,7 +27,7 @@ const getAllCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.getAllCourses = getAllCourses;
 const getTeacherCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: teacherId } = req.params;
+        const { teacherId } = req.params;
         const teacher = yield TeacherModel_1.default.findById(teacherId);
         const courses = yield CourseModel_1.default.find({ teachers: teacher });
         res.status(200).send({ courses });
@@ -38,6 +38,18 @@ const getTeacherCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getTeacherCourses = getTeacherCourses;
+const getCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId } = req.params;
+        const course = yield CourseModel_1.default.findById(courseId);
+        res.status(200).send({ course });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: error.message });
+    }
+});
+exports.getCourse = getCourse;
 const createCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { courseName, teacherId } = req.body;
@@ -57,7 +69,7 @@ const createCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.createCourse = createCourse;
 const deleteCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: courseId } = req.params;
+        const { courseId } = req.params;
         const course = yield CourseModel_1.default.deleteOne({ _id: courseId });
         const courses = yield CourseModel_1.default.find({});
         res.status(200).send({ courses, course });
@@ -70,7 +82,7 @@ const deleteCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 exports.deleteCourse = deleteCourse;
 const updateCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: courseId } = req.params;
+        const { courseId } = req.params;
         const data = req.body;
         const courses = yield CourseModel_1.default.find({});
         const course = yield CourseModel_1.default.findById({ _id: courseId });

@@ -50,7 +50,7 @@ function getTeacher(teacherId) {
 }
 function getTeacherCourses(teacherId) {
     return __awaiter(this, void 0, void 0, function* () {
-        return fetch(`${courseApi}/${teacherId}`)
+        return fetch(`${courseApi}/teacher/${teacherId}`)
             .then((res) => res.json())
             .then(({ courses }) => courses)
             .catch((error) => console.error(error));
@@ -70,5 +70,13 @@ function checkTeacherId(teacherId) {
         catch (error) {
             console.error(error);
         }
+    });
+}
+function getCourse(courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield fetch(`${courseApi}/${courseId}`)
+            .then((res) => res.json())
+            .then(({ course }) => course)
+            .catch((error) => console.error(error));
     });
 }

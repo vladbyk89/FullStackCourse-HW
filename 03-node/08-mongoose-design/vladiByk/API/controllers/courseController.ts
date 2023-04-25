@@ -21,10 +21,25 @@ export const getTeacherCourses = async (
   next: NextFunction
 ) => {
   try {
-    const { id: teacherId } = req.params;
+    const { teacherId } = req.params;
     const teacher = await Teacher.findById(teacherId);
     const courses = await Course.find({ teachers: teacher });
     res.status(200).send({ courses });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
+export const getCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId)
+    res.status(200).send({ course });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });
@@ -57,7 +72,7 @@ export const deleteCourse = async (
   next: NextFunction
 ) => {
   try {
-    const { id: courseId } = req.params;
+    const { courseId } = req.params;
     const course = await Course.deleteOne({ _id: courseId });
     const courses = await Course.find({});
 
@@ -74,7 +89,7 @@ export const updateCourse = async (
   next: NextFunction
 ) => {
   try {
-    const { id: courseId } = req.params;
+    const { courseId } = req.params;
     const data = req.body;
     const courses = await Course.find({});
     const course = await Course.findById({ _id: courseId });

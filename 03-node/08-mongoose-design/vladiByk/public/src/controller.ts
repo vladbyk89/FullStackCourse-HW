@@ -65,7 +65,7 @@ async function renderCoursePage(teacherId: string) {
 
   coursesBtn.forEach((btn) =>
     btn.addEventListener("click", () => {
-      displayStudents(btn.id);
+      displayStudents(btn.id, teacherId);
     })
   );
 }
@@ -92,7 +92,11 @@ function renderCoursesRoot(coursesList: CourseTemplate[]) {
     .join("");
 }
 
-async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
+async function renderStudentsPage(
+  studentsRootHtml: string,
+  courseId: string,
+  teacherId: string
+) {
   try {
     root.innerHTML = `
       <h1>Student list</h1>
@@ -127,7 +131,9 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
       "#backToCoursesPageBtn"
     ) as HTMLButtonElement;
 
-    // backToCoursesPageBtn.addEventListener('click', () => renderCoursePage())
+    backToCoursesPageBtn.addEventListener("click", () =>
+      renderCoursePage(teacherId)
+    );
 
     activateDeleteButtons();
     activateEditButtons(courseId);
@@ -136,7 +142,7 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
   }
 }
 
-const displayStudents = async (courseId: string) => {
+const displayStudents = async (courseId: string, teacherId: string) => {
   try {
     let studentsRootHtml: string = " ";
 
@@ -156,12 +162,13 @@ const displayStudents = async (courseId: string) => {
                 <i class="fa-regular fa-pen-to-square"></i>
               </div>
           </div>`;
-          renderStudentsPage(studentsRootHtml, courseId);
+          renderStudentsPage(studentsRootHtml, courseId, teacherId);
         })
       )
       .catch((error) => console.log(error));
 
-    if (!studentsInCourse) renderStudentsPage(studentsRootHtml, courseId);
+    if (!studentsInCourse)
+      renderStudentsPage(studentsRootHtml, courseId, teacherId);
   } catch (error) {
     console.error(error);
   }

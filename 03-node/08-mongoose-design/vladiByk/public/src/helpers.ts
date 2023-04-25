@@ -36,12 +36,11 @@ async function getTeacher(teacherId: string) {
 }
 
 async function getTeacherCourses(teacherId: string) {
-  return fetch(`${courseApi}/${teacherId}`)
+  return fetch(`${courseApi}/teacher/${teacherId}`)
     .then((res) => res.json())
     .then(({ courses }) => courses)
     .catch((error) => console.error(error));
 }
-
 
 async function checkTeacherId(teacherId: string) {
   try {
@@ -54,4 +53,11 @@ async function checkTeacherId(teacherId: string) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function getCourse(courseId: string) {
+  return await fetch(`${courseApi}/${courseId}`)
+    .then((res) => res.json())
+    .then(({ course }) => course)
+    .catch((error) => console.error(error));
 }
