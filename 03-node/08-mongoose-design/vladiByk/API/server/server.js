@@ -26,7 +26,7 @@ function StartServer() {
         yield mongoose_1.default
             .connect(config_1.config.mongo.url, { retryWrites: true, w: "majority" })
             .then(() => {
-            console.log("Connected to DB...");
+            console.log("Connected to MongoDB...");
         })
             .catch((err) => {
             console.error(err);

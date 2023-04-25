@@ -28,23 +28,10 @@ function renderTeacherLogin() {
   });
 }
 
-async function checkTeacherId(teacherId: string) {
-  try {
-    const teacher: TeacherTemplate = await fetch(`${teacherApi}/${teacherId}`)
-      .then((res) => res.json())
-      .then(({ teacher }) => teacher)
-      .catch((error) => console.error(error));
-    if (!teacher) throw new Error("Teacher not found!");
-    renderCoursePage(teacher._id);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function renderCoursePage(teacherId: string) {
   const teacher: TeacherTemplate = await getTeacher(teacherId);
 
-  const courses: CourseTemplate[] = await getTeacherCourses(teacherId)
+  const courses: CourseTemplate[] = await getTeacherCourses(teacherId);
 
   root.innerHTML = `
     <h1>${teacher.name} courses</h1>
@@ -123,6 +110,7 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
           /></label>
           <button type="submit">Add</button>
       </form>
+      <button id="backToCoursesPageBtn">return</button>
       <div class="editWindow"></div>
     `;
 
@@ -135,6 +123,12 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
       handleAddStudentForm(addStudentForm, courseId);
     });
 
+    const backToCoursesPageBtn = root.querySelector(
+      "#backToCoursesPageBtn"
+    ) as HTMLButtonElement;
+
+    // backToCoursesPageBtn.addEventListener('click', () => renderCoursePage())
+
     activateDeleteButtons();
     activateEditButtons(courseId);
   } catch (error) {
@@ -146,7 +140,7 @@ const displayStudents = async (courseId: string) => {
   try {
     let studentsRootHtml: string = " ";
 
-    await fetch(`${studentApi}/inCourse/${courseId}`)
+    const studentsInCourse = await fetch(`${studentApi}/inCourse/${courseId}`)
       .then((res) => res.json())
       .then(({ students }) =>
         students.forEach(async (student: StudentTemplate) => {
@@ -166,6 +160,8 @@ const displayStudents = async (courseId: string) => {
         })
       )
       .catch((error) => console.log(error));
+
+    if (!studentsInCourse) renderStudentsPage(studentsRootHtml, courseId);
   } catch (error) {
     console.error(error);
   }

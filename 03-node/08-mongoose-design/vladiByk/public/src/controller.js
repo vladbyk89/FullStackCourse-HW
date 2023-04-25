@@ -30,22 +30,6 @@ function renderTeacherLogin() {
         teacherIdInput.value = "";
     });
 }
-function checkTeacherId(teacherId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const teacher = yield fetch(`${teacherApi}/${teacherId}`)
-                .then((res) => res.json())
-                .then(({ teacher }) => teacher)
-                .catch((error) => console.error(error));
-            if (!teacher)
-                throw new Error("Teacher not found!");
-            renderCoursePage(teacher._id);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    });
-}
 function renderCoursePage(teacherId) {
     return __awaiter(this, void 0, void 0, function* () {
         const teacher = yield getTeacher(teacherId);
@@ -117,6 +101,7 @@ function renderStudentsPage(studentsRootHtml, courseId) {
           /></label>
           <button type="submit">Add</button>
       </form>
+      <button id="backToCoursesPageBtn">return</button>
       <div class="editWindow"></div>
     `;
             const addStudentForm = root.querySelector("#addStudentForm");
@@ -124,6 +109,8 @@ function renderStudentsPage(studentsRootHtml, courseId) {
                 e.preventDefault();
                 handleAddStudentForm(addStudentForm, courseId);
             });
+            const backToCoursesPageBtn = root.querySelector("#backToCoursesPageBtn");
+            // backToCoursesPageBtn.addEventListener('click', () => renderCoursePage())
             activateDeleteButtons();
             activateEditButtons(courseId);
         }
@@ -135,7 +122,7 @@ function renderStudentsPage(studentsRootHtml, courseId) {
 const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let studentsRootHtml = " ";
-        yield fetch(`${studentApi}/inCourse/${courseId}`)
+        const studentsInCourse = yield fetch(`${studentApi}/inCourse/${courseId}`)
             .then((res) => res.json())
             .then(({ students }) => students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
             const newStudent = new Student(student.name, student._id, courseId);
@@ -154,6 +141,8 @@ const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function
             renderStudentsPage(studentsRootHtml, courseId);
         })))
             .catch((error) => console.log(error));
+        if (!studentsInCourse)
+            renderStudentsPage(studentsRootHtml, courseId);
     }
     catch (error) {
         console.error(error);

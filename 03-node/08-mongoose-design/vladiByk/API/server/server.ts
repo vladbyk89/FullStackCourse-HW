@@ -14,7 +14,7 @@ async function StartServer() {
   await mongoose
     .connect(config.mongo.url, { retryWrites: true, w: "majority" })
     .then(() => {
-      console.log("Connected to DB...");
+      console.log("Connected to MongoDB...");
     })
     .catch((err) => {
       console.error(err);

@@ -56,3 +56,19 @@ function getTeacherCourses(teacherId) {
             .catch((error) => console.error(error));
     });
 }
+function checkTeacherId(teacherId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const teacher = yield fetch(`${teacherApi}/${teacherId}`)
+                .then((res) => res.json())
+                .then(({ teacher }) => teacher)
+                .catch((error) => console.error(error));
+            if (!teacher)
+                throw new Error("Teacher not found!");
+            renderCoursePage(teacher._id);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    });
+}

@@ -41,3 +41,17 @@ async function getTeacherCourses(teacherId: string) {
     .then(({ courses }) => courses)
     .catch((error) => console.error(error));
 }
+
+
+async function checkTeacherId(teacherId: string) {
+  try {
+    const teacher: TeacherTemplate = await fetch(`${teacherApi}/${teacherId}`)
+      .then((res) => res.json())
+      .then(({ teacher }) => teacher)
+      .catch((error) => console.error(error));
+    if (!teacher) throw new Error("Teacher not found!");
+    renderCoursePage(teacher._id);
+  } catch (error) {
+    console.error(error);
+  }
+}
