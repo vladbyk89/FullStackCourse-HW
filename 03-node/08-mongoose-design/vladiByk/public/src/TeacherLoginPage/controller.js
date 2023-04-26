@@ -30,58 +30,23 @@ function renderTeacherLogin() {
         teacherIdInput.value = "";
     });
 }
-function renderCoursePage(teacherId) {
+function checkTeacherId(teacherId) {
     return __awaiter(this, void 0, void 0, function* () {
-        sessionStorage.setItem("teacherId", teacherId);
-        const teacher = yield getTeacher(teacherId);
-        const courses = yield getTeacherCourses(teacherId);
-        root.innerHTML = `
-    <h1>${teacher.name} courses</h1>
-    <div id="coursesRoot">
-    </div>
-    <form id="addCourseForm">
-      <label for="courseName">
-        <input
-          type="text"
-          name="courseName"
-          id="courseName"
-          placeholder="Astrophysics..."
-        />
-      </label>
-      <button type="submit">Add</button>
-    </form>
-    `;
-        renderCoursesRoot(courses);
-        const addCourseForm = root.querySelector("#addCourseForm");
-        addCourseForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const courseName = addCourseForm.courseName.value;
-            addCourse(courseName, teacherId);
-        });
-        const coursesBtn = root.querySelectorAll(".course");
-        coursesBtn.forEach((btn) => btn.addEventListener("click", () => {
-            displayStudents(btn.id);
-        }));
+        try {
+            const teacher = yield fetch(`${teacherApi}/${teacherId}`)
+                .then((res) => res.json())
+                .then(({ teacher }) => teacher)
+                .catch((error) => console.error(error));
+            if (!teacher)
+                throw new Error("Teacher not found!");
+            // renderCoursePage(teacher._id);
+            sessionStorage.setItem("teacherId", teacherId);
+            location.href = "/teacher";
+        }
+        catch (error) {
+            console.error(error);
+        }
     });
-}
-function addCourse(courseName, teacherId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield fetch(`${courseApi}`, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ courseName, teacherId }),
-        }).catch((error) => console.error(error));
-        renderCoursePage(teacherId);
-    });
-}
-function renderCoursesRoot(coursesList) {
-    const coursesRoot = document.querySelector("#coursesRoot");
-    coursesRoot.innerHTML = coursesList
-        .map((course) => `<button class="course" id="${course._id}">${course.name}</button>`)
-        .join("");
 }
 function renderStudentsPage(studentsRootHtml, courseId) {
     return __awaiter(this, void 0, void 0, function* () {

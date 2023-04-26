@@ -65,10 +65,11 @@ exports.deleteTeacher = deleteTeacher;
 const updateTeacher = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id: teacherId } = req.params;
-        const data = req.body;
-        const teachers = yield TeacherModel_1.default.find({});
-        const teacher = yield TeacherModel_1.default.findById({ _id: teacherId });
-        res.status(201).json({ teachers });
+        res.redirect("/teacher");
+        // const data = req.body;
+        // const teachers = await Teacher.find({});
+        // const teacher = await Teacher.findById({ _id: teacherId });
+        // res.status(201).json({ teachers });
     }
     catch (error) {
         console.error(error);

@@ -44,6 +44,7 @@ function StartServer() {
             res.sendFile(path_1.default.join(__dirname, "../../public", "students.html"));
         }));
         app.get("/teacher", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            console.log('/teacher is called...');
             res.sendFile(path_1.default.join(__dirname, "../../public", "courses.html"));
         }));
         app.listen(config_1.config.server.port, () => {

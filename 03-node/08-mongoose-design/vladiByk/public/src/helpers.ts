@@ -42,19 +42,6 @@ async function getTeacherCourses(teacherId: string) {
     .catch((error) => console.error(error));
 }
 
-async function checkTeacherId(teacherId: string) {
-  try {
-    const teacher: TeacherTemplate = await fetch(`${teacherApi}/${teacherId}`)
-      .then((res) => res.json())
-      .then(({ teacher }) => teacher)
-      .catch((error) => console.error(error));
-    if (!teacher) throw new Error("Teacher not found!");
-    renderCoursePage(teacher._id);
-    sessionStorage.setItem("teacherId", teacherId);
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 async function getCourse(courseId: string) {
   return await fetch(`${courseApi}/${courseId}`)

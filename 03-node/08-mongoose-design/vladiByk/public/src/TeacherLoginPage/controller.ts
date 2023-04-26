@@ -1,66 +1,46 @@
-async function renderCoursePage(teacherId: string) {
-
-  const teacher: TeacherTemplate = await getTeacher(teacherId);
-
-  const courses: CourseTemplate[] = await getTeacherCourses(teacherId);
-
+function renderTeacherLogin() {
   root.innerHTML = `
-    <h1>${teacher.name} courses</h1>
-    <div id="coursesRoot">
-    </div>
-    <form id="addCourseForm">
-      <label for="courseName">
+    <h1>Teacher login page</h1>
+    <form id="teacherLoginForm">
+      <label for="teacherId"
+        >Teacher ID:
         <input
           type="text"
-          name="courseName"
-          id="courseName"
-          placeholder="Astrophysics..."
-        />
-      </label>
-      <button type="submit">Add</button>
-    </form>
-    `;
-  renderCoursesRoot(courses);
+          name="teacherId"
+          id="teacherId"
+          placeholder="Fdgg23fWe34..."
+      /></label>
+      <button type="submit">Enter</button>
+    </form>`;
 
-  const addCourseForm = root.querySelector("#addCourseForm") as HTMLFormElement;
+  const teacherLoginForm = document.querySelector(
+    "#teacherLoginForm"
+  ) as HTMLFormElement;
 
-  addCourseForm.addEventListener("submit", (e: Event) => {
+  const teacherIdInput = document.querySelector(
+    "#teacherId"
+  ) as HTMLInputElement;
+
+  teacherLoginForm.addEventListener("submit", (e: Event) => {
     e.preventDefault();
-    const courseName = addCourseForm.courseName.value;
-    addCourse(courseName, teacherId);
+    checkTeacherId(teacherIdInput.value);
+    teacherIdInput.value = "";
   });
-
-  const coursesBtn = root.querySelectorAll(
-    ".course"
-  ) as NodeListOf<HTMLButtonElement>;
-
-  coursesBtn.forEach((btn) =>
-    btn.addEventListener("click", () => {
-      displayStudents(btn.id);
-    })
-  );
 }
 
-async function addCourse(courseName: string, teacherId: string) {
-  await fetch(`${courseApi}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ courseName, teacherId }),
-  }).catch((error) => console.error(error));
-  renderCoursePage(teacherId);
-}
-
-function renderCoursesRoot(coursesList: CourseTemplate[]) {
-  const coursesRoot = document.querySelector("#coursesRoot") as HTMLDivElement;
-  coursesRoot.innerHTML = coursesList
-    .map(
-      (course) =>
-        `<button class="course" id="${course._id}">${course.name}</button>`
-    )
-    .join("");
+async function checkTeacherId(teacherId: string) {
+  try {
+    const teacher: TeacherTemplate = await fetch(`${teacherApi}/${teacherId}`)
+      .then((res) => res.json())
+      .then(({ teacher }) => teacher)
+      .catch((error) => console.error(error));
+    if (!teacher) throw new Error("Teacher not found!");
+    // renderCoursePage(teacher._id);
+    sessionStorage.setItem("teacherId", teacherId);
+    location.href = "/teacher";
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 async function renderStudentsPage(studentsRootHtml: string, courseId: string) {

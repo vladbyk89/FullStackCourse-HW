@@ -39,6 +39,7 @@ async function StartServer() {
   app.get(
     "/teacher",
     async (req: Request, res: Response, next: NextFunction) => {
+      console.log('/teacher is called...');
       res.sendFile(path.join(__dirname, "../../public", "courses.html"));
     }
   );
