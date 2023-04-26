@@ -12,7 +12,7 @@ import {
 studentRouter.route("/").get(getAllStudents).post(createStudent);
 
 studentRouter
-  .route("/:id")
+  .route("/:studentId")
   .get(getStudent)
   .patch(updateStudent)
   .delete(deleteStudent);

@@ -10,7 +10,7 @@ exports.studentRouter = studentRouter;
 const studentController_1 = require("../controllers/studentController");
 studentRouter.route("/").get(studentController_1.getAllStudents).post(studentController_1.createStudent);
 studentRouter
-    .route("/:id")
+    .route("/:studentId")
     .get(studentController_1.getStudent)
     .patch(studentController_1.updateStudent)
     .delete(studentController_1.deleteStudent);

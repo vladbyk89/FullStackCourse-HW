@@ -78,8 +78,12 @@ const deleteStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.deleteStudent = deleteStudent;
 const updateStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id: studentId } = req.params;
-        const student = yield StudentModel_1.default.findById({ _id: studentId });
+        const { studentId } = req.params;
+        const { newName } = req.body;
+        yield StudentModel_1.default.findByIdAndUpdate(studentId, {
+            name: newName,
+        });
+        const student = yield StudentModel_1.default.findById(studentId);
         res.status(201).json({ student });
     }
     catch (error) {

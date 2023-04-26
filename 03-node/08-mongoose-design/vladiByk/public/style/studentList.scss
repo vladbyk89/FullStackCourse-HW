@@ -60,6 +60,12 @@
   align-items: center;
   flex-direction: column;
   display: none;
+  .editWindowHead {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   ul {
     // border: 1px solid black;
     width: 50%;

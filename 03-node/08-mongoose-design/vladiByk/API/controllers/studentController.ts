@@ -85,8 +85,12 @@ export const updateStudent = async (
   next: NextFunction
 ) => {
   try {
-    const { id: studentId } = req.params;
-    const student = await Student.findById({ _id: studentId });
+    const { studentId } = req.params;
+    const { newName } = req.body;
+    await Student.findByIdAndUpdate(studentId, {
+      name: newName,
+    });
+    const student = await Student.findById(studentId);
     res.status(201).json({ student });
   } catch (error: any) {
     console.error(error);

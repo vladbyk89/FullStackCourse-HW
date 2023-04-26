@@ -148,7 +148,10 @@ function renderGradeList(gradeList) {
     </li>`)
         .join("");
     editWindow.innerHTML = `
-        <h2>${studentName}</h2>
+        <div class="editWindowHead">
+          <h2>${studentName}</h2>
+          <i class="fa-solid fa-user-pen"></i>
+        </div>
         <ul class="gradesList" id="${courseId}">
             <div><b>Grades</b><b>Edit</b></div>
           ${listItemsHtml}
@@ -165,9 +168,36 @@ function renderGradeList(gradeList) {
         displayStudents(courseId);
         editWindow.style.display = "none";
     });
+    activateEditUserName(studentId);
     activateEditGradeButtons();
     activateDeleteGradeBtn();
     activateAddGrade(courseId, studentId);
+}
+function activateEditUserName(studentId) {
+    const editBtn = root.querySelector(".fa-user-pen");
+    const editWindowHead = root.querySelector(".editWindowHead");
+    const headerEle = editWindowHead.firstElementChild;
+    const nameInputEle = document.createElement("input");
+    nameInputEle.setAttribute("type", "text");
+    nameInputEle.value = headerEle.innerHTML;
+    editBtn.addEventListener("click", () => {
+        editWindowHead.replaceChild(nameInputEle, headerEle);
+        nameInputEle.focus();
+    });
+    nameInputEle.addEventListener("keyup", (e) => __awaiter(this, void 0, void 0, function* () {
+        if (e.key === "Enter") {
+            headerEle.innerHTML = nameInputEle.value;
+            editWindowHead.replaceChild(headerEle, nameInputEle);
+            yield fetch(`${studentApi}/${studentId}`, {
+                method: "PATCH",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ newName: nameInputEle.value }),
+            });
+        }
+    }));
 }
 function activateEditGradeButtons() {
     const editGradeBtns = root.querySelectorAll(".fa-pen");

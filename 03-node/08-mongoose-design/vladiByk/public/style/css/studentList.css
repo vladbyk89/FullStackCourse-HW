@@ -52,6 +52,12 @@
   flex-direction: column;
   display: none;
 }
+.editWindow .editWindowHead {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .editWindow ul {
   width: 50%;
   display: flex;
