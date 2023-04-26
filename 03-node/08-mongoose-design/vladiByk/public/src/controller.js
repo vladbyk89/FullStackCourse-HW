@@ -32,6 +32,7 @@ function renderTeacherLogin() {
 }
 function renderCoursePage(teacherId) {
     return __awaiter(this, void 0, void 0, function* () {
+        sessionStorage.setItem("teacherId", teacherId);
         const teacher = yield getTeacher(teacherId);
         const courses = yield getTeacherCourses(teacherId);
         root.innerHTML = `
@@ -59,7 +60,7 @@ function renderCoursePage(teacherId) {
         });
         const coursesBtn = root.querySelectorAll(".course");
         coursesBtn.forEach((btn) => btn.addEventListener("click", () => {
-            displayStudents(btn.id, teacherId);
+            displayStudents(btn.id);
         }));
     });
 }
@@ -82,9 +83,10 @@ function renderCoursesRoot(coursesList) {
         .map((course) => `<button class="course" id="${course._id}">${course.name}</button>`)
         .join("");
 }
-function renderStudentsPage(studentsRootHtml, courseId, teacherId) {
+function renderStudentsPage(studentsRootHtml, courseId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const teacherId = sessionStorage.getItem("teacherId");
             root.innerHTML = `
       <h1>Student list</h1>
       <div id="studentsRoot">
@@ -110,7 +112,11 @@ function renderStudentsPage(studentsRootHtml, courseId, teacherId) {
                 handleAddStudentForm(addStudentForm, courseId);
             });
             const backToCoursesPageBtn = root.querySelector("#backToCoursesPageBtn");
-            backToCoursesPageBtn.addEventListener("click", () => renderCoursePage(teacherId));
+            backToCoursesPageBtn.addEventListener("click", () => {
+                if (!teacherId)
+                    throw new Error("Teacher ID not found");
+                renderCoursePage(teacherId);
+            });
             activateDeleteButtons();
             activateEditButtons(courseId);
         }
@@ -119,7 +125,7 @@ function renderStudentsPage(studentsRootHtml, courseId, teacherId) {
         }
     });
 }
-const displayStudents = (courseId, teacherId) => __awaiter(void 0, void 0, void 0, function* () {
+const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let studentsRootHtml = " ";
         const studentsInCourse = yield fetch(`${studentApi}/inCourse/${courseId}`)
@@ -138,11 +144,11 @@ const displayStudents = (courseId, teacherId) => __awaiter(void 0, void 0, void 
                 <i class="fa-regular fa-pen-to-square"></i>
               </div>
           </div>`;
-            renderStudentsPage(studentsRootHtml, courseId, teacherId);
+            renderStudentsPage(studentsRootHtml, courseId);
         })))
             .catch((error) => console.log(error));
         if (!studentsInCourse)
-            renderStudentsPage(studentsRootHtml, courseId, teacherId);
+            renderStudentsPage(studentsRootHtml, courseId);
     }
     catch (error) {
         console.error(error);

@@ -29,6 +29,7 @@ function renderTeacherLogin() {
 }
 
 async function renderCoursePage(teacherId: string) {
+  sessionStorage.setItem("teacherId", teacherId);
   const teacher: TeacherTemplate = await getTeacher(teacherId);
 
   const courses: CourseTemplate[] = await getTeacherCourses(teacherId);
@@ -65,7 +66,7 @@ async function renderCoursePage(teacherId: string) {
 
   coursesBtn.forEach((btn) =>
     btn.addEventListener("click", () => {
-      displayStudents(btn.id, teacherId);
+      displayStudents(btn.id);
     })
   );
 }
@@ -92,12 +93,9 @@ function renderCoursesRoot(coursesList: CourseTemplate[]) {
     .join("");
 }
 
-async function renderStudentsPage(
-  studentsRootHtml: string,
-  courseId: string,
-  teacherId: string
-) {
+async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
   try {
+    const teacherId = sessionStorage.getItem("teacherId");
     root.innerHTML = `
       <h1>Student list</h1>
       <div id="studentsRoot">
@@ -131,9 +129,10 @@ async function renderStudentsPage(
       "#backToCoursesPageBtn"
     ) as HTMLButtonElement;
 
-    backToCoursesPageBtn.addEventListener("click", () =>
-      renderCoursePage(teacherId)
-    );
+    backToCoursesPageBtn.addEventListener("click", () => {
+      if (!teacherId) throw new Error("Teacher ID not found");
+      renderCoursePage(teacherId);
+    });
 
     activateDeleteButtons();
     activateEditButtons(courseId);
@@ -142,7 +141,7 @@ async function renderStudentsPage(
   }
 }
 
-const displayStudents = async (courseId: string, teacherId: string) => {
+const displayStudents = async (courseId: string) => {
   try {
     let studentsRootHtml: string = " ";
 
@@ -162,13 +161,12 @@ const displayStudents = async (courseId: string, teacherId: string) => {
                 <i class="fa-regular fa-pen-to-square"></i>
               </div>
           </div>`;
-          renderStudentsPage(studentsRootHtml, courseId, teacherId);
+          renderStudentsPage(studentsRootHtml, courseId);
         })
       )
       .catch((error) => console.log(error));
 
-    if (!studentsInCourse)
-      renderStudentsPage(studentsRootHtml, courseId, teacherId);
+    if (!studentsInCourse) renderStudentsPage(studentsRootHtml, courseId);
   } catch (error) {
     console.error(error);
   }
