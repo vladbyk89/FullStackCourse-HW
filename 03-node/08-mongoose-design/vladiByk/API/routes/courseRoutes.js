@@ -10,4 +10,8 @@ exports.courseRouter = courseRouter;
 const courseController_1 = require("../controllers/courseController");
 courseRouter.route("/").get(courseController_1.getAllCourses).post(courseController_1.createCourse);
 courseRouter.route("/teacher/:teacherId").get(courseController_1.getTeacherCourses);
-courseRouter.route("/:courseId").get(courseController_1.getCourse).patch(courseController_1.updateCourse).delete(courseController_1.deleteCourse);
+courseRouter
+    .route("/:courseId")
+    .get(courseController_1.getCourse)
+    .patch(courseController_1.updateCourse)
+    .delete(courseController_1.deleteCourse);

@@ -1,6 +1,7 @@
 import Course from "../models/CourseModel";
 import Teacher from "../models/TeacherModel";
 import { NextFunction, Response, Request } from "express";
+import path from "path";
 
 export const getAllCourses = async (
   req: Request,
@@ -38,7 +39,7 @@ export const getCourse = async (
 ) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId)
+    const course = await Course.findById(courseId);
     res.status(200).send({ course });
   } catch (error: any) {
     console.error(error);
@@ -96,6 +97,19 @@ export const updateCourse = async (
     res.status(201).json({ msg: "Updating course..." });
   } catch (error: any) {
     console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
+export const renderCoursePage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.send("/course path...")
+    // res.sendFile(path.join(__dirname, '../public', 'index1.html'));
+  } catch (error: any) {
     res.status(500).send({ error: error.message });
   }
 };

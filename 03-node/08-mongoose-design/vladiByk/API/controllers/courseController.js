@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getTeacherCourses = exports.getAllCourses = void 0;
+exports.renderCoursePage = exports.updateCourse = exports.deleteCourse = exports.createCourse = exports.getCourse = exports.getTeacherCourses = exports.getAllCourses = void 0;
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
 const TeacherModel_1 = __importDefault(require("../models/TeacherModel"));
 const getAllCourses = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,3 +94,13 @@ const updateCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.updateCourse = updateCourse;
+const renderCoursePage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.send("/course path...");
+        // res.sendFile(path.join(__dirname, '../public', 'index1.html'));
+    }
+    catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+exports.renderCoursePage = renderCoursePage;
