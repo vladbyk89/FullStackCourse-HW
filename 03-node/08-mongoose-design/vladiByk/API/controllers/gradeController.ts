@@ -34,6 +34,23 @@ export const getStudentGradesInCourse = async (
   }
 };
 
+export const deleteAllGradesInCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId);
+    console.log(course);
+    const grades = await Grade.deleteMany({ course });
+    res.status(200).send({ grades });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
 export const createGrade = async (
   req: Request,
   res: Response,
@@ -88,6 +105,20 @@ export const updateGrade = async (
     await Grade.findByIdAndUpdate(gradeId, { score: newScore });
     const grade = await Grade.findById(gradeId);
     res.status(200).json({ grade });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
+export const emptyCollection = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const grades = await Grade.deleteMany({});
+    res.status(201).json({ grades });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

@@ -43,13 +43,11 @@ function renderStudentsPage(studentsRootHtml, courseId) {
             const deleteCourseBtn = root.querySelector("#deleteCourseBtn");
             deleteCourseBtn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
                 const courseId = sessionStorage.getItem("courseId");
-                yield fetch(`${courseApi}/${courseId}`, {
-                    method: "DELETE",
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                });
+                if (!courseId)
+                    throw new Error("Course ID not found in session storage");
+                yield deleteAllStudentsInCourse(courseId);
+                yield deleteAllGradesInCourse(courseId);
+                yield deleteCourse(courseId);
                 location.href = "/teacher";
             }));
             activateDeleteButtons();
@@ -65,25 +63,37 @@ const displayStudents = (courseId) => __awaiter(void 0, void 0, void 0, function
         let studentsRootHtml = " ";
         const studentsInCourse = yield fetch(`${studentApi}/inCourse/${courseId}`)
             .then((res) => res.json())
-            .then(({ students }) => students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
-            const newStudent = new Student(student.name, student._id, courseId);
-            const studentAvgScore = yield newStudent.getAverageInCourse(courseId);
-            if (!studentAvgScore)
-                return;
-            studentsRootHtml += `
-            <div class="studentDiv" id="${student._id}">
-                <b>${student.name}</b>
-                <span>${studentAvgScore.toFixed(2)}</span>
-                <div class="crudIcons">
-                  <i class="fa-regular fa-trash-can"></i>
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </div>
-            </div>`;
-            renderStudentsPage(studentsRootHtml, courseId);
-        })))
+            .then(({ students }) => {
+            students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
+                const newStudent = new Student(student.name, student._id, courseId);
+                const studentAvgScore = yield newStudent.getAverageInCourse(courseId);
+                if (!studentAvgScore) {
+                    studentsRootHtml += `
+              <div class="studentDiv" id="${student._id}">
+                  <b>${student.name}</b>
+                  <span>-</span>
+                  <div class="crudIcons">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </div>
+              </div>`;
+                }
+                else {
+                    studentsRootHtml += `
+              <div class="studentDiv" id="${student._id}">
+                  <b>${student.name}</b>
+                  <span>${studentAvgScore.toFixed(2)}</span>
+                  <div class="crudIcons">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </div>
+              </div>`;
+                }
+                renderStudentsPage(studentsRootHtml, courseId);
+            }));
+        })
             .catch((error) => console.log(error));
-        if (!studentsInCourse)
-            renderStudentsPage(studentsRootHtml, courseId);
+        renderStudentsPage(studentsRootHtml, courseId);
     }
     catch (error) {
         console.error(error);
@@ -125,28 +135,32 @@ function activateEditButtons(courseId) {
         editButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             const studentId = (_b = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.id;
-            const grades = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
-                .then((res) => res.json())
-                .then(({ grades }) => grades)
-                .catch((error) => console.error(error));
-            renderGradeList(grades);
+            if (!studentId)
+                throw new Error("Student id not found");
+            const grades = yield getGradesInCourse(studentId, courseId);
+            const student = yield getStudent(studentId);
+            if (!grades)
+                renderGradeList(grades, student.name, studentId, courseId);
+            renderGradeList(grades, student.name, studentId, courseId);
         })));
     });
 }
-function renderGradeList(gradeList) {
-    const studentName = gradeList[0].student.name;
-    const studentId = gradeList[0].student._id;
-    const courseId = gradeList[0].course._id;
+function renderGradeList(gradeList, studentName, studentId, courseId) {
     const editWindow = document.querySelector(".editWindow");
-    const listItemsHtml = gradeList
-        .map((grade) => `<li id="${grade._id}">
-      <span>${grade.score.toFixed(2)}</span>
-      <div class="listIcons">
-        <i class="fa-regular fa-square-minus"></i>
-        <i class="fa-solid fa-pen"></i>
-      </div>
-    </li>`)
-        .join("");
+    let listItemsHtml;
+    if (!gradeList)
+        listItemsHtml = "";
+    else {
+        listItemsHtml = gradeList
+            .map((grade) => `<li id="${grade._id}">
+        <span>${grade.score.toFixed(2)}</span>
+        <div class="listIcons">
+          <i class="fa-regular fa-square-minus"></i>
+          <i class="fa-solid fa-pen"></i>
+        </div>
+      </li>`)
+            .join("");
+    }
     editWindow.innerHTML = `
         <div class="editWindowHead">
           <h2>${studentName}</h2>
@@ -284,11 +298,9 @@ function activateAddGrade(courseId, studentId) {
                 .then((res) => res.json())
                 .then(({ grade }) => grade)
                 .catch((error) => console.error(error));
-            const gradeList = yield fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
-                .then((res) => res.json())
-                .then(({ grades }) => grades)
-                .catch((error) => console.error(error));
-            renderGradeList(gradeList);
+            const gradeList = yield getGradesInCourse(studentId, courseId);
+            const student = yield getStudent(studentId);
+            renderGradeList(gradeList, student.name, studentId, courseId);
             newGradeInput.value = "";
         });
     }

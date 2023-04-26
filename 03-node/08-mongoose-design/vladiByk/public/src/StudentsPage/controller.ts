@@ -44,13 +44,12 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
 
     deleteCourseBtn.addEventListener("click", async () => {
       const courseId = sessionStorage.getItem("courseId");
-      await fetch(`${courseApi}/${courseId}`, {
-        method: "DELETE",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+
+      if (!courseId) throw new Error("Course ID not found in session storage");
+
+      await deleteAllStudentsInCourse(courseId);
+      await deleteAllGradesInCourse(courseId);
+      await deleteCourse(courseId);
       location.href = "/teacher";
     });
 
@@ -67,26 +66,37 @@ const displayStudents = async (courseId: string) => {
 
     const studentsInCourse = await fetch(`${studentApi}/inCourse/${courseId}`)
       .then((res) => res.json())
-      .then(({ students }) =>
+      .then(({ students }) => {
         students.forEach(async (student: StudentTemplate) => {
           const newStudent = new Student(student.name, student._id, courseId);
           const studentAvgScore = await newStudent.getAverageInCourse(courseId);
-          if (!studentAvgScore) return;
-          studentsRootHtml += `
-            <div class="studentDiv" id="${student._id}">
-                <b>${student.name}</b>
-                <span>${studentAvgScore.toFixed(2)}</span>
-                <div class="crudIcons">
-                  <i class="fa-regular fa-trash-can"></i>
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </div>
-            </div>`;
+          if (!studentAvgScore) {
+            studentsRootHtml += `
+              <div class="studentDiv" id="${student._id}">
+                  <b>${student.name}</b>
+                  <span>-</span>
+                  <div class="crudIcons">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </div>
+              </div>`;
+          } else {
+            studentsRootHtml += `
+              <div class="studentDiv" id="${student._id}">
+                  <b>${student.name}</b>
+                  <span>${studentAvgScore.toFixed(2)}</span>
+                  <div class="crudIcons">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </div>
+              </div>`;
+          }
           renderStudentsPage(studentsRootHtml, courseId);
-        })
-      )
+        });
+      })
       .catch((error) => console.log(error));
 
-    if (!studentsInCourse) renderStudentsPage(studentsRootHtml, courseId);
+    renderStudentsPage(studentsRootHtml, courseId);
   } catch (error) {
     console.error(error);
   }
@@ -145,38 +155,45 @@ async function activateEditButtons(courseId: string) {
   editButtons.forEach((btn) =>
     btn.addEventListener("click", async () => {
       const studentId = btn.parentElement?.parentElement?.id;
+      if (!studentId) throw new Error("Student id not found");
 
-      const grades: GradeTemplate[] = await fetch(
-        `${gradesApi}/${studentId}?courseId=${courseId}`
-      )
-        .then((res) => res.json())
-        .then(({ grades }) => grades)
-        .catch((error) => console.error(error));
+      const grades: GradeTemplate[] = await getGradesInCourse(
+        studentId,
+        courseId
+      );
 
-      renderGradeList(grades);
+      const student: StudentTemplate = await getStudent(studentId);
+      if (!grades) renderGradeList(grades, student.name, studentId, courseId);
+      renderGradeList(grades, student.name, studentId, courseId);
     })
   );
 }
 
-function renderGradeList(gradeList: GradeTemplate[]) {
-  const studentName = gradeList[0].student.name;
-  const studentId = gradeList[0].student._id;
-  const courseId = gradeList[0].course._id;
-
+function renderGradeList(
+  gradeList: GradeTemplate[] | false,
+  studentName: string,
+  studentId: string,
+  courseId: string
+) {
   const editWindow = document.querySelector(".editWindow") as HTMLDivElement;
 
-  const listItemsHtml = gradeList
-    .map(
-      (grade) =>
-        `<li id="${grade._id}">
-      <span>${grade.score.toFixed(2)}</span>
-      <div class="listIcons">
-        <i class="fa-regular fa-square-minus"></i>
-        <i class="fa-solid fa-pen"></i>
-      </div>
-    </li>`
-    )
-    .join("");
+  let listItemsHtml: string;
+
+  if (!gradeList) listItemsHtml = "";
+  else {
+    listItemsHtml = gradeList
+      .map(
+        (grade) =>
+          `<li id="${grade._id}">
+        <span>${grade.score.toFixed(2)}</span>
+        <div class="listIcons">
+          <i class="fa-regular fa-square-minus"></i>
+          <i class="fa-solid fa-pen"></i>
+        </div>
+      </li>`
+      )
+      .join("");
+  }
 
   editWindow.innerHTML = `
         <div class="editWindowHead">
@@ -366,14 +383,9 @@ function activateAddGrade(courseId: string, studentId: string) {
       .then(({ grade }) => grade)
       .catch((error) => console.error(error));
 
-    const gradeList = await fetch(
-      `${gradesApi}/${studentId}?courseId=${courseId}`
-    )
-      .then((res) => res.json())
-      .then(({ grades }) => grades)
-      .catch((error) => console.error(error));
-
-    renderGradeList(gradeList);
+    const gradeList = await getGradesInCourse(studentId, courseId);
+    const student: StudentTemplate = await getStudent(studentId);
+    renderGradeList(gradeList, student.name, studentId, courseId);
 
     newGradeInput.value = "";
   }

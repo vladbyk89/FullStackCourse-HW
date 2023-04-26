@@ -64,3 +64,52 @@ function getCourse(courseId) {
             .catch((error) => console.error(error));
     });
 }
+function getStudent(studentId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield fetch(`${studentApi}/${studentId}`)
+            .then((res) => res.json())
+            .then(({ student }) => student)
+            .catch((error) => console.error(error));
+    });
+}
+function getGradesInCourse(studentId, courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(`${gradesApi}/${studentId}?courseId=${courseId}`)
+            .then((res) => res.json())
+            .then(({ grades }) => grades)
+            .catch((error) => console.error(error));
+    });
+}
+function deleteAllGradesInCourse(courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(`${gradesApi}/inCourse/${courseId}`, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        }).catch((error) => console.error(error));
+    });
+}
+function deleteAllStudentsInCourse(courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(`${studentApi}/inCourse/${courseId}`, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        }).catch((error) => console.error(error));
+    });
+}
+function deleteCourse(courseId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fetch(`${courseApi}/${courseId}`, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        }).catch((error) => console.error(error));
+    });
+}

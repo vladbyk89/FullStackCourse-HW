@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateGrade = exports.deleteGrade = exports.createGrade = exports.getStudentGradesInCourse = exports.getAllGrades = void 0;
+exports.emptyCollection = exports.updateGrade = exports.deleteGrade = exports.createGrade = exports.deleteAllGradesInCourse = exports.getStudentGradesInCourse = exports.getAllGrades = void 0;
 const GradeModel_1 = __importDefault(require("../models/GradeModel"));
 const StudentModel_1 = __importDefault(require("../models/StudentModel"));
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
@@ -41,6 +41,20 @@ const getStudentGradesInCourse = (req, res, next) => __awaiter(void 0, void 0, v
     }
 });
 exports.getStudentGradesInCourse = getStudentGradesInCourse;
+const deleteAllGradesInCourse = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId } = req.params;
+        const course = yield CourseModel_1.default.findById(courseId);
+        console.log(course);
+        const grades = yield GradeModel_1.default.deleteMany({ course });
+        res.status(200).send({ grades });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: error.message });
+    }
+});
+exports.deleteAllGradesInCourse = deleteAllGradesInCourse;
 const createGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { score, courseId, studentId } = req.body;
@@ -92,3 +106,14 @@ const updateGrade = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.updateGrade = updateGrade;
+const emptyCollection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const grades = yield GradeModel_1.default.deleteMany({});
+        res.status(201).json({ grades });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: error.message });
+    }
+});
+exports.emptyCollection = emptyCollection;
