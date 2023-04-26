@@ -37,7 +37,9 @@ function renderCoursePage(teacherId) {
         });
         const coursesBtn = root.querySelectorAll(".course");
         coursesBtn.forEach((btn) => btn.addEventListener("click", () => {
-            displayStudents(btn.id);
+            sessionStorage.setItem("courseId", btn.id);
+            location.href = '/course';
+            // displayStudents(btn.id);
         }));
     });
 }

@@ -70,12 +70,11 @@ export const updateTeacher = async (
 ) => {
   try {
     const { id: teacherId } = req.params;
-    res.redirect("/teacher");
-    // const data = req.body;
-    // const teachers = await Teacher.find({});
-    // const teacher = await Teacher.findById({ _id: teacherId });
+    const data = req.body;
+    const teachers = await Teacher.find({});
+    const teacher = await Teacher.findById({ _id: teacherId });
 
-    // res.status(201).json({ teachers });
+    res.status(201).json({ teachers });
   } catch (error: any) {
     console.error(error);
     res.status(500).send({ error: error.message });

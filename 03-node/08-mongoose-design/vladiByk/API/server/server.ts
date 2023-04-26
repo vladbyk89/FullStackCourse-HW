@@ -30,7 +30,7 @@ async function StartServer() {
   app.use("/api/v1/grades", gradeRouter);
 
   app.get(
-    "/teacher/course",
+    "/course",
     async (req: Request, res: Response, next: NextFunction) => {
       res.sendFile(path.join(__dirname, "../../public", "students.html"));
     }
@@ -39,7 +39,6 @@ async function StartServer() {
   app.get(
     "/teacher",
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log('/teacher is called...');
       res.sendFile(path.join(__dirname, "../../public", "courses.html"));
     }
   );
