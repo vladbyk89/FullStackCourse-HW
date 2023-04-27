@@ -11,8 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 function renderStudentsPage(studentsRootHtml, courseId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const course = yield getCourse(courseId);
             root.innerHTML = `
-        <h1>Student list</h1>
+        <h1>${course.name} student list</h1>
         <div id="studentsRoot">
           ${studentsRootHtml}
         </div>
@@ -50,7 +51,7 @@ function renderStudentsPage(studentsRootHtml, courseId) {
                 yield deleteCourse(courseId);
                 location.href = "/teacher";
             }));
-            activateDeleteButtons();
+            activateDeleteStudentButtons();
             activateEditButtons(courseId);
         }
         catch (error) {
@@ -108,20 +109,22 @@ function handleAddStudentForm(addStudentForm, courseId) {
         displayStudents(courseId);
     });
 }
-function activateDeleteButtons() {
+function activateDeleteStudentButtons() {
     try {
         const deleteButtons = document.querySelectorAll(".fa-trash-can");
         deleteButtons.forEach((btn) => btn.addEventListener("click", () => __awaiter(this, void 0, void 0, function* () {
             var _a;
             const studentDiv = (_a = btn.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement;
-            const id = studentDiv.id;
+            const studentId = studentDiv.id;
+            const courseId = sessionStorage.getItem("courseId");
             studentDiv.remove();
-            yield fetch(`${studentApi}/${id}`, {
+            yield fetch(`${studentApi}/${studentId}`, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({ courseId }),
             }).catch((error) => console.error(error));
         })));
     }

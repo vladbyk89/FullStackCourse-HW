@@ -45,7 +45,6 @@ const deleteAllGradesInCourse = (req, res, next) => __awaiter(void 0, void 0, vo
     try {
         const { courseId } = req.params;
         const course = yield CourseModel_1.default.findById(courseId);
-        console.log(course);
         const grades = yield GradeModel_1.default.deleteMany({ course });
         res.status(200).send({ grades });
     }

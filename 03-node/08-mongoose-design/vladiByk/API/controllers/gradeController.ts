@@ -42,7 +42,6 @@ export const deleteAllGradesInCourse = async (
   try {
     const { courseId } = req.params;
     const course = await Course.findById(courseId);
-    console.log(course);
     const grades = await Grade.deleteMany({ course });
     res.status(200).send({ grades });
   } catch (error: any) {

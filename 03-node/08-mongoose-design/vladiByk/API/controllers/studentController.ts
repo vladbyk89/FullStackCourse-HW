@@ -1,5 +1,6 @@
 import Student from "../models/StudentModel";
 import Course from "../models/CourseModel";
+import Grade from "../models/GradeModel";
 import { NextFunction, Response, Request } from "express";
 
 export const getAllStudents = async (
@@ -53,7 +54,14 @@ export const deleteStudent = async (
 ) => {
   try {
     const { studentId } = req.params;
-    const student = await Student.deleteOne({ _id: studentId });
+    const { courseId } = req.body;
+    const findCourse = await Course.findById(courseId);
+    const findStudent = await Student.findById(studentId);
+    const deleteGrades = await Grade.deleteOne({
+      course: findCourse,
+      student: findStudent,
+    });
+    await Student.deleteOne({ _id: studentId });
     const students = await Student.find({});
 
     res.status(200).json({ students });
@@ -121,7 +129,6 @@ export const deleteAllStudentsInCourse = async (
   try {
     const { courseId } = req.params;
     const course = await Course.findById(courseId);
-    console.log(course);
     const deletedStudents = await Student.deleteMany({ courses: course });
     const students = await Student.find({});
 

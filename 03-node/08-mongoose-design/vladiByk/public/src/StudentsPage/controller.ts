@@ -1,7 +1,9 @@
 async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
   try {
+    const course: TeacherTemplate = await getCourse(courseId);
+
     root.innerHTML = `
-        <h1>Student list</h1>
+        <h1>${course.name} student list</h1>
         <div id="studentsRoot">
           ${studentsRootHtml}
         </div>
@@ -53,7 +55,7 @@ async function renderStudentsPage(studentsRootHtml: string, courseId: string) {
       location.href = "/teacher";
     });
 
-    activateDeleteButtons();
+    activateDeleteStudentButtons();
     activateEditButtons(courseId);
   } catch (error) {
     console.log(error);
@@ -119,7 +121,7 @@ async function handleAddStudentForm(
   displayStudents(courseId);
 }
 
-function activateDeleteButtons() {
+function activateDeleteStudentButtons() {
   try {
     const deleteButtons = document.querySelectorAll(
       ".fa-trash-can"
@@ -129,16 +131,17 @@ function activateDeleteButtons() {
       btn.addEventListener("click", async () => {
         const studentDiv = btn.parentElement?.parentElement as HTMLDivElement;
 
-        const id = studentDiv.id;
-
+        const studentId = studentDiv.id;
+        const courseId = sessionStorage.getItem("courseId");
         studentDiv.remove();
 
-        await fetch(`${studentApi}/${id}`, {
+        await fetch(`${studentApi}/${studentId}`, {
           method: "DELETE",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ courseId }),
         }).catch((error) => console.error(error));
       })
     );
@@ -221,6 +224,7 @@ function renderGradeList(
     displayStudents(courseId);
     editWindow.style.display = "none";
   });
+
   activateEditUserName(studentId);
   activateEditGradeButtons();
   activateDeleteGradeBtn();
@@ -229,9 +233,11 @@ function renderGradeList(
 
 function activateEditUserName(studentId: string) {
   const editBtn = root.querySelector(".fa-user-pen") as HTMLElement;
+
   const editWindowHead = root.querySelector(
     ".editWindowHead"
   ) as HTMLDivElement;
+
   const headerEle = editWindowHead.firstElementChild as HTMLHeadElement;
 
   const nameInputEle = document.createElement("input") as HTMLInputElement;

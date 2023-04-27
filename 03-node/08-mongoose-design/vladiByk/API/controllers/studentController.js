@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAllStudentsInCourse = exports.getStudentsInCourse = exports.emptyCollection = exports.updateStudent = exports.deleteStudent = exports.getStudent = exports.createStudent = exports.getAllStudents = void 0;
 const StudentModel_1 = __importDefault(require("../models/StudentModel"));
 const CourseModel_1 = __importDefault(require("../models/CourseModel"));
+const GradeModel_1 = __importDefault(require("../models/GradeModel"));
 const getAllStudents = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const students = yield StudentModel_1.default.find({});
@@ -53,7 +54,14 @@ exports.getStudent = getStudent;
 const deleteStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { studentId } = req.params;
-        const student = yield StudentModel_1.default.deleteOne({ _id: studentId });
+        const { courseId } = req.body;
+        const findCourse = yield CourseModel_1.default.findById(courseId);
+        const findStudent = yield StudentModel_1.default.findById(studentId);
+        const deleteGrades = yield GradeModel_1.default.deleteOne({
+            course: findCourse,
+            student: findStudent,
+        });
+        yield StudentModel_1.default.deleteOne({ _id: studentId });
         const students = yield StudentModel_1.default.find({});
         res.status(200).json({ students });
     }
@@ -108,7 +116,6 @@ const deleteAllStudentsInCourse = (req, res, next) => __awaiter(void 0, void 0, 
     try {
         const { courseId } = req.params;
         const course = yield CourseModel_1.default.findById(courseId);
-        console.log(course);
         const deletedStudents = yield StudentModel_1.default.deleteMany({ courses: course });
         const students = yield StudentModel_1.default.find({});
         res.status(200).json({ deletedStudents });
